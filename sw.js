@@ -1,3 +1,3 @@
-// 這段是最簡的版本，不會快取、不會離線，只做「單一實例」的啟用
 self.addEventListener('install', e => self.skipWaiting());
-self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+self.addEventListener('activate', e => self.clients.claim());
+// 不攔截導覽，先完全當作沒 SW：讓瀏覽器照常請求 /CCpaka/ 路徑
