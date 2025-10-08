@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
+  <script>
+(function(){
+  var want = '/CCpaka/';
+  var isGhPages = /\.github\.io$/i.test(location.hostname);
+  if(isGhPages && !location.pathname.startsWith(want)){
+    location.replace(want + (location.search || '') + (location.hash || ''));
+  }
+})();
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>打卡系統</title>
