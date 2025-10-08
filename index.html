@@ -1375,10 +1375,9 @@ if ('serviceWorker' in navigator) {
     }
   }, 400);
 })();
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js')
-  .then(() => console.log('✅ Service Worker 已啟用'))
-  .catch(err => console.warn('❌ Service Worker 啟用失敗', err));
+
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js'); // 千萬不要寫成 {scope:'/'}
 }
 </script>
 
