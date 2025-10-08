@@ -490,7 +490,22 @@ body:has(#fab-tools){
 .toast-stack{
   margin-bottom: var(--fab-clearance, 0);
 }
-
+/* ===== 行動版快速修正：還原字級、縮小鈴鐺，避免爆版 ===== */
+@media (max-width: 820px){
+  #resp,
+  #resp .badge,
+  .card:has(#sumIn) .title strong,
+  .card:has(#sumIn) .title .badge,
+  #sumBadge,
+  .type-pill,
+  #sumIn,#sumOut,#sumAno,
+  #todayList .recentItem,
+  #todayList .recentItem .badge{
+    font-size: clamp(14px, 3.8vw, 18px) !important;
+  }
+  .bell-btn{ right: 12px; top: 12px; width: 48px; height: 48px; font-size: 26px; }
+  #btn-sound{ right: 64px; width: 44px; height: 44px; font-size: 22px; }
+}
 </style>
 <!-- === PWA 設定 === -->
 <!-- ✅ 改成相對路徑，千萬不要用 /manifest.webmanifest -->
@@ -689,6 +704,38 @@ body:has(#fab-tools){
 </div>
 
 <script>
+  /* ===== Apps Script 防呆：沒有 google.script.run 就改成「假接口」避免拋錯 ===== */
+(function(){
+  const hasGAS = !!(window.google && google.script && google.script.run);
+
+  // 提供一個「假 run」：保留鏈式 API，但不連任何後端，只回傳空資料
+  function makeDummyRun(){
+    const api = {
+      _ok: null, _fail: null,
+      withSuccessHandler(fn){ api._ok = fn; return api; },
+      withFailureHandler(fn){ api._fail = fn; return api; },
+      getTodaySummaryAndListSecure(){ api._ok && api._ok({ summary:{}, list:[] }); },
+      getMyRequestsSecure(){ api._ok && api._ok({ ok:true, counts:{pending:0, approved:0, rejected:0}, items:[] }); },
+      listMyRequests(){ api._ok && api._ok({ rows:[] }); },
+      saveEvent(){ api._ok && api._ok({ ok:false, message:'Demo (GitHub Pages) 無法連到 Apps Script' }); },
+      requestTripSimple(){ api._ok && api._ok({ ok:false }); },
+      requestCorrectionSimple(){ api._ok && api._ok({ ok:false }); },
+      rebuildCalendarSecure(){ api._ok && api._ok({ ok:true }); }
+    };
+    return api;
+  }
+
+  // 若沒有 Apps Script，就掛上一個假的介面，避免整個腳本中斷
+  if(!hasGAS){
+    window.google = window.google || {};
+    google.script = google.script || {};
+    google.script.run = makeDummyRun();
+    // 也避免「載入就自動查詢/載入申請」這類動作做白工：對外暴露一個旗標給後面程式判斷
+    window.__NO_BACKEND__ = true;
+  }else{
+    window.__NO_BACKEND__ = false;
+  }
+})();
 /* ================= 主邏輯（維持你原本的流程） ================= */
 {
   function $(s,el){ return (el||document).querySelector(s); }
