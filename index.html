@@ -1,15 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-  <script>
-(function(){
-  var want = '/CCpaka/';
-  var isGhPages = /\.github\.io$/i.test(location.hostname);
-  if(isGhPages && !location.pathname.startsWith(want)){
-    location.replace(want + (location.search || '') + (location.hash || ''));
-  }
-})();
-</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>打卡系統</title>
@@ -510,7 +501,7 @@ body:has(#fab-tools){
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="打卡系統">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
 
 
 </head>
@@ -699,7 +690,7 @@ body:has(#fab-tools){
 
 <script>
 /* ================= 主邏輯（維持你原本的流程） ================= */
-(function(){
+{
   function $(s,el){ return (el||document).querySelector(s); }
 
   function tick(){
@@ -1350,23 +1341,7 @@ function offsite(){
   return { success, offsite, error, toggle, prime };
 })();
 
-/* ================== PWA 控制：防重開分頁 ================== */
 
-// 1️⃣ 強制所有進入點導向固定入口（避免分頁越開越多）
-(function unifyEntry(){
-  try{
-    const want = new URL('/?pwa=1', location.origin).toString();
-    const now  = location.origin + location.pathname + location.search;
-    if (!now.startsWith(want)) location.replace(want + location.hash);
-  }catch(_){}
-})();
-
-// 2️⃣ 註冊 Service Worker（只註冊一次）
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js', { scope: '/' })
-  .then(()=>console.log('[PWA] service worker registered'))
-  .catch(err=>console.warn('[PWA] SW 註冊失敗',err));
-}
 
 // 3️⃣ 單一實例偵測：若已有舊分頁開啟，提示用戶回原分頁
 (function singletonGuard(){
@@ -1387,7 +1362,9 @@ if ('serviceWorker' in navigator) {
 })();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then(()=>console.log('SW registered'))
+    .catch(e=>console.warn('SW failed', e));
 }
 </script>
 </body>
