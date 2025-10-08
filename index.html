@@ -502,7 +502,8 @@ body:has(#fab-tools){
 
 </style>
 <!-- === PWA 設定 === -->
-<link rel="manifest" href="manifest.webmanifest">
+<!-- ✅ 改成相對路徑，千萬不要用 /manifest.webmanifest -->
+<link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#16a34a">
 
 <!-- iOS 加到主畫面專用設定（可防止開新分頁） -->
@@ -1385,10 +1386,9 @@ if ('serviceWorker' in navigator) {
   }, 400);
 })();
 
-  if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js'); // 千萬不要寫成 {scope:'/'}
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js', { scope: './' }).catch(()=>{});
 }
 </script>
-
 </body>
 </html>
