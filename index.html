@@ -396,7 +396,7 @@ input#uid, input#pass, input#passcode {
 }
 /* === Modal 專用：只縮小彈窗內欄位與 placeholder，大廳不受影響 === */
 #req-card input,
-#req-card select,+#req-card textarea {
+#req-card select, #req-card textarea {
   height: clamp(44px, 6.5vh, 56px) !important;
   font-size: clamp(16px, 3.8vw, 18px) !important;
   line-height: 1.2 !important;
@@ -737,7 +737,8 @@ body:has(#fab-tools){
   }
 })();
 /* ================= 主邏輯（維持你原本的流程） ================= */
-{function $(s,el){ return (el||document).querySelector(s); }
+(function(){
+function $(s,el){ return (el||document).querySelector(s); }
 
   function tick(){
     var el = $('#clock'); if(!el) return;
