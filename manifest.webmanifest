@@ -1,9 +1,9 @@
 {
   "name": "打卡系統",
   "short_name": "打卡",
-  "id": "/?pwa=1",
-  "start_url": "/?pwa=1",
-  "scope": "/",
+  "id": "/CCpaka/?pwa=1",
+  "start_url": "/CCpaka/?pwa=1",
+  "scope": "/CCpaka/",
   "display": "standalone",
   "background_color": "#f6f8fb",
   "theme_color": "#16a34a",
