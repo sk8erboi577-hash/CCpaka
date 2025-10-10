@@ -38,7 +38,13 @@
   .card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding: clamp(12px,1.8vw,18px);height:100%;width:100%}
   .title{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
   .muted{color:var(--muted)} .badge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--chip);font-size:.92em}
-  .clock{border:2px solid var(--border);border-radius:14px;padding:10px 14px;background:#fff;font-weight:800}
+  .clock{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:8px 12px;          /* 稍微收一點 */
+  background:#fff;
+  font-weight:800
+}
 
   /* 主區域單欄 */
   .main-grid{display:block;width:100%;margin:0;padding:0}
@@ -62,7 +68,14 @@
   body.is-freeze{overflow:hidden}
   #btn-loc,#locChip{display:none !important}
 
-  .version-badge{font-size:1.0em;margin-left:10px;padding:14px 16px;border-radius:8px;background:var(--chip);color:var(--muted)}
+.version-badge{
+  font-size: clamp(12px, 3.2vw, 14px);
+  margin-left:10px;
+  padding: 6px 10px;         /* 原本 14px 16px */
+  border-radius:8px;
+  background:var(--chip);
+  color:var(--muted)
+}
 
   /* 🔔 鈴鐺 */
   .bell-btn{position: fixed; right: 14px; top: 14px; z-index: 999;
@@ -203,15 +216,21 @@
   #todayList .recentItem .muted{ max-width:100% !important; overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
 
   /* 今日明細標題 + 右上說明 */
-  .details-card .title strong{ font-size: clamp(36px, 5.2vw, 46px) !important; line-height:1.2 !important; }
-  .details-card .title .muted{ font-size: clamp(32px, 4.8vw, 40px) !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
+.details-card .title strong{
+  font-size: clamp(20px, 4.6vw, 24px) !important;
+  line-height:1.2 !important;
+}
+.details-card .title .muted{
+  font-size: clamp(14px, 3.6vw, 16px) !important;
+  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+}
 
   /* 時鐘 */
-  #clock, #clockBox{
-    font-size: clamp(30px, 4vw, 36px); font-weight:700; line-height:1.6; padding:12px 18px;
-    border:2px solid var(--border); border-radius:10px; background:#fff; text-align:center; min-height:80px;
-    display:flex; align-items:center; justify-content:center;
-  }
+ font-size: clamp(30px, 4vw, 36px); font-weight:700; line-height:1.6; padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px; background:#fff; text-align:center; min-height:80px;
+  display:flex; align-items:center; justify-content:center;
+}
 
   /* Login Bar：不換行 + 寬度分配 */
   .card .row:first-child, .login-row{ display:flex; align-items:stretch; gap:6px; flex-wrap:nowrap !important; }
