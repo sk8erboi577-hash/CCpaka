@@ -1113,35 +1113,6 @@ document.getElementById('btn-help')?.addEventListener('click', function(){
     .listMyRequests(uid);
 }
 
-    let settled=false;
-    const finish=(pack,err)=>{ if(settled) return; settled=true; clearTimeout(watchdog);
-      if(err){ setDot(null); if(showModal){ const body=document.getElementById('req-body'); if(body){ body.innerHTML='<div style="color:#b91c1c;font-weight:700">讀取失敗</div><div class="muted" style="margin-top:6px">訊息：'+(err.message||String(err))+'</div>'; } } else { alert('讀取失敗：'+(err.message||String(err))); } return; }
-      setDot(pack); if(showModal) openRequestsModal(pack);
-    };
-    const watchdog=setTimeout(()=>{ finish(null,new Error('讀取逾時')); },15000);
-
-    google.script.run
-      .withSuccessHandler(ret=>{ if(!ret || ret.ok===false){ return; } finish(ret,null); })
-      .withFailureHandler(err=>{ console.warn('getMyRequestsSecure 失敗，改用 listMyRequests：',err); })
-      .getMyRequestsSecure(uid, pass);
-
-    setTimeout(()=>{ if(settled) return;
-      google.script.run
-        .withSuccessHandler(r=>{ if(settled) return;
-          const items  = Array.isArray(r?.rows) ? r.rows : (Array.isArray(r) ? r : []);
-          const counts = { pending:0, approved:0, rejected:0 };
-          items.forEach(it=>{ const s=String(it.status||it.state||'').toLowerCase(); if(s==='pending') counts.pending++; else if(s==='approved') counts.approved++; else if(s==='rejected') counts.rejected++; });
-          finish({ ok:true, counts, items }, null);
-        })
-        .withFailureHandler(err=>{ if(settled) return; finish(null, err); })
-        .listMyRequests(uid);
-    },6000);
-  }
-  document.getElementById('btn-bell')?.addEventListener('click', ()=>loadMyRequests(true));
-  window.addEventListener('load', ()=>setTimeout(()=>loadMyRequests(false), 1000));
-
-  window.addEventListener('load', function(){ setTimeout(function(){ safeRefresh(false); }, 300 + Math.random()*3000); });
-
 })(); // 主 IIFE end
 
 // ★新增：讓指定按鈕做一次 Pulse 動畫
