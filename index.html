@@ -268,8 +268,8 @@ body.is-freeze{ overflow:hidden; }
 
 /* 面板內每顆功能鈕 */
 .tool-btn{
-  height: clamp(60px, 10vh, 90px);
-  font-size: clamp(30px, 6vw, 36px);
+  height: clamp(66px, 11vh, 92px);
+  font-size: clamp(36px, 6.6vw, 40px);
   border-radius: 12px;
   border: 2px solid var(--border);
   display:flex; align-items:center; justify-content:center;
@@ -344,6 +344,22 @@ body.is-freeze{ overflow:hidden; }
 /* Toast 與 FAB 之間的安全距離（有齒輪時） */
 body:has(#fab-tools){ --fab-clearance: 80px; }
 
+  /* === Busy Mask 隱藏設定（防止底部出現「處理中…」） === */
+.busy-mask {
+  display: none !important;        /* 預設完全隱藏 */
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.7);
+  z-index: 20000;
+  align-items: center;
+  justify-content: center;
+}
+.busy-mask.show {
+  display: flex !important;        /* 真的要顯示時，程式再加 .show */
+}
+.busy-inner .msg {
+  display: none;                   /* 不要顯示「處理中…」這幾個字 */
+}
 </style>
 
 
