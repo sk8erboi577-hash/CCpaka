@@ -169,17 +169,17 @@ body.is-freeze{overflow:hidden}
 .busy-inner .msg{font-size:15px;line-height:1.3}
 
 /* 浮動工具面板 */
-.fab{ position: fixed; right: 18px; bottom: 18px; width:100px; height:100px; border-radius:50%;
-  background:var(--secondary); color:#fff; font-size:66px; border:none; box-shadow:0 8px 20px rgba(0,0,0,.25);
+.fab{ position: fixed; right: 18px; bottom: 18px; width:75px; height:75px; border-radius:50%;
+  background:var(--secondary); color:#fff; font-size:40px; border:none; box-shadow:0 8px 20px rgba(0,0,0,.25);
   display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10002; transition:.25s}
 .fab:hover{ transform:scale(1.05); background:#2563eb; }
-#tool-panel{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:1200px;
+#tool-panel{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:720px;
   background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -10px 30px rgba(0,0,0,.25); transition:transform .3s; z-index:10001;
   padding:18px 16px 24px; display:grid; grid-template-columns:1fr 1fr; gap:20px}
 #tool-panel.show{ transform:translateX(-50%) translateY(0); }
 #tool-mask{ position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none }
 #tool-mask.show{ display:block }
-.tool-btn{ height:220px; border-radius:14px; border:2px solid var(--border); font-weight:900; font-size:75px;
+.tool-btn{ height:60px; border-radius:14px; border:2px solid var(--border); font-weight:900; font-size:75px;
   display:flex; align-items:center; justify-content:center; gap:6px; color:#fff }
 .tool-leave{ background:var(--leave); border-color:var(--leave) }
 .tool-trip{ background:var(--trip); border-color:var(--trip) }
