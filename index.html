@@ -387,7 +387,17 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 @supports (height: 100svh){
   #req-card{ max-height: 86svh; }
 }
+/* === 彈窗優先層級與尺寸：只處理 #req-modal / #req-card === */
+#req-modal{ z-index: 20000; }                  /* 比工具面板(10001)還高 */
+#req-mask { z-index: 20000; }                  /* 背景遮罩同層，確保可點擊關閉 */
+#req-card {
+  max-height: 86dvh;                           /* 防止內容被底部切掉 */
+  width: min(560px, 92vw);                     /* 手機不會太寬、桌機不會太窄 */
+  overflow: auto;                              /* 內容超出可捲動 */
+}
 
+/* 送出按鈕容器：讓最下面那顆不貼邊、在右下角 */
+#req-card .actions{ text-align:right; margin-top:8px; }
 </style>
 
 
@@ -1347,6 +1357,85 @@ if ('serviceWorker' in navigator) {
     .then(()=>console.log('SW registered'))
     .catch(e=>console.warn('SW failed', e));
 }
+  // === 彈窗開啟保險器（不改名、不覆蓋你原本的監聽）===
+(function(){
+  // 只關工具面板
+  function closeToolPanel(){
+    try{
+      var panel = document.getElementById('tool-panel');
+      var mask  = document.getElementById('tool-mask');
+      if(panel){ panel.classList.remove('show'); }
+      if(mask){  mask.classList.remove('show');  }
+    }catch(_){}
+  }
+
+  // 補一次開啟流程：用現有 template & 你的 openModal()
+  function openFromTemplate(tplId, title, fill){
+    var tpl = document.getElementById(tplId);
+    if(!tpl) return;
+    var root = tpl.content.firstElementChild.cloneNode(true);
+    try{
+      if(typeof fill === 'function') fill(root);
+    }catch(_){}
+    // 你的 openModal 已經存在，直接用
+    if (typeof openModal === 'function') {
+      openModal(title, root);
+    }
+  }
+
+  // 事件委派：只攔四顆按鈕（ID 一字不動）
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('#btn-open-trip, #btn-open-corr, #btn-leave, #btn-help');
+    if(!btn) return;
+
+    // 先把工具面板收起來，避免擋住彈窗
+    closeToolPanel();
+
+    // 依 ID 開啟對應彈窗（內容照你現有欄位自動帶入）
+    if(btn.id === 'btn-open-trip'){
+      openFromTemplate('tpl-trip','出差申請', function(root){
+        var q = s=>root.querySelector(s);
+        var uid = document.getElementById('uid')?.value||'';
+        var pw  = document.getElementById('pass')?.value||'';
+        if(q('#trip-uid'))  q('#trip-uid').value  = uid;
+        if(q('#trip-pass')) q('#trip-pass').value = pw;
+      });
+    }else if(btn.id === 'btn-open-corr'){
+      openFromTemplate('tpl-corr','補卡申請', function(root){
+        var q = s=>root.querySelector(s);
+        var uid = document.getElementById('uid')?.value||'';
+        var pw  = document.getElementById('pass')?.value||'';
+        if(q('#corr-uid'))  q('#corr-uid').value  = uid;
+        if(q('#corr-pass')) q('#corr-pass').value = pw;
+      });
+    }else if(btn.id === 'btn-leave'){
+      openFromTemplate('tpl-leave','請假申請', function(root){
+        var q = s=>root.querySelector(s);
+        var uid = document.getElementById('uid')?.value||'';
+        var pw  = document.getElementById('pass')?.value||'';
+        if(q('#lv-uid'))  q('#lv-uid').value  = uid;
+        if(q('#lv-pass')) q('#lv-pass').value = pw;
+
+        // 互斥：整天 / 時數（和你原本邏輯一致）
+        var chkFull = q('#lv-fullday');
+        var inputH  = q('#lv-hours');
+        var endWrap = q('#lv-end')?.closest('label');
+        var hrsWrap = inputH?.closest('label');
+        function apply(){
+          var full = !!(chkFull && chkFull.checked);
+          if(endWrap) endWrap.style.display = full ? '' : 'none';
+          if(hrsWrap) hrsWrap.style.display = full ? 'none' : '';
+          if(inputH)  inputH.disabled = full, full && (inputH.value = '');
+        }
+        chkFull && chkFull.addEventListener('change', apply);
+        apply();
+      });
+    }else if(btn.id === 'btn-help'){
+      // 使用說明
+      openFromTemplate('tpl-help','使用說明');
+    }
+  }, false);
+})();
 </script>
 </body>
 </html>
