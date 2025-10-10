@@ -343,6 +343,121 @@ body.is-freeze{ overflow:hidden; }
 
 /* Toast 與 FAB 之間的安全距離（有齒輪時） */
 body:has(#fab-tools){ --fab-clearance: 80px; }
+
+  /* ========== [彈窗/Modal 整體] ========== */
+#req-modal{ display:none; }
+#req-mask{
+  position:fixed; inset:0; background:rgba(0,0,0,.35);
+  z-index:10000;
+}
+
+/* 面板本體（彈窗白卡） */
+#req-card{
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-50%);
+  /* ← 重要：寬高包含 padding，避免超出螢幕被剪 */
+  box-sizing:border-box;
+
+  width: min(560px, 92vw);          /* 面板寬度 */
+  max-height: 88vh;                 /* 面板最高不超過視窗 */
+  overflow: auto;                   /* 超出時可卷動 */
+  padding: 16px 18px;               /* 內距 */
+  background:#fff;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.2);
+  z-index:10001;
+  /* iOS 長字/emoji 不撐破 */
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+/* 標題列（左標題＋右「關閉」鈕） */
+#req-card .hd{
+  position: sticky; top: 0;         /* 卷動時標題固定在頂 */
+  background:#fff;                  /* sticky 才不會「透」出底色 */
+  padding-bottom: 8px;
+  margin:-6px -2px 12px;            /* 視覺更緊湊 */
+  display:flex; justify-content:space-between; align-items:center;
+  z-index: 1;
+}
+#req-title{ margin:0; font-size: 20px; font-weight: 800; }
+
+/* ========== [彈窗內的表單欄位尺寸] ========== */
+/* 把全站的大尺寸取消，改為彈窗用的小尺寸 */
+#req-card input[type="text"],
+#req-card input[type="password"],
+#req-card input[type="date"],
+#req-card input[type="time"],
+#req-card input[type="number"],
+#req-card select,
+#req-card textarea{
+  box-sizing: border-box;
+  width: 100%;
+  height: clamp(42px, 6.0vh, 54px) !important;   /* 高度適中 */
+  font-size: clamp(15px, 3.8vw, 17px) !important;
+  line-height: 1.2 !important;
+  padding: 10px 12px !important;
+  border: 2px solid var(--border) !important;
+  border-radius: 14px !important;
+  background:#fff;
+}
+
+/* placeholder 大小（只影響彈窗） */
+#req-card input::placeholder,
+#req-card textarea::placeholder{
+  font-size: clamp(14px, 3.6vw, 16px) !important;
+  opacity: .65;
+}
+
+/* 欄位群組間距 */
+#req-card label,
+#req-card .row{ display:block; margin: 10px 0; }
+
+/* 日期/時間兩欄排版（補卡） */
+#req-card .row.two{
+  display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+}
+@media (max-width: 420px){
+  #req-card .row.two{ grid-template-columns: 1fr; }  /* 小螢幕改單欄 */
+}
+
+/* 「類型 / 請假類別」的下拉樣式 */
+#req-card select{
+  appearance:auto; background:#fff;
+}
+
+/* 彈窗內主要動作按鈕 */
+#req-card .btn{
+  height: clamp(42px, 6vh, 54px) !important;
+  font-weight: 800; border-radius: 12px !important;
+}
+
+/* ========== [覆寫：避免登入列的大字影響彈窗] ========== */
+/* 你的站上有把 #uid/#pass 放大，這裡把彈窗裡同名欄位還原 */
+#req-card #trip-uid, #req-card #trip-pass,
+#req-card #corr-uid, #req-card #corr-pass,
+#req-card #lv-uid,   #req-card #lv-pass{
+  height: clamp(42px, 6vh, 54px) !important;
+  font-size: clamp(15px, 3.8vw, 17px) !important;
+}
+#req-card #trip-uid::placeholder, #req-card #trip-pass::placeholder,
+#req-card #corr-uid::placeholder, #req-card #corr-pass::placeholder,
+#req-card #lv-uid::placeholder,   #req-card #lv-pass::placeholder{
+  font-size: clamp(14px, 3.6vw, 16px) !important;
+}
+
+/* ========== [請假：整天 / 時數 區塊] ========== */
+#req-card .hint, #req-card .example, #req-card .muted{
+  font-size: clamp(13px, 3.4vw, 15px) !important;
+}
+
+/* ========== [彈窗在超小螢幕的 fallback] ========== */
+@media (max-width: 360px){
+  #req-card{ width: 94vw; padding: 14px 14px; }
+  #req-title{ font-size: 18px; }
+}
+
 </style>
 
 
