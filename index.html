@@ -300,15 +300,24 @@ body.is-freeze{ overflow:hidden; }
 #req-title{ margin:0; font-size:18px; font-weight:800; }
 
 /* 彈窗內欄位（回到中型高度，不吃首頁放大規則） */
-#req-card input, #req-card select, #req-card textarea{
-  height: clamp(44px, 6.5vh, 56px);
-  font-size: clamp(16px, 3.8vw, 18px);
-  line-height:1.2; padding: 10px 12px; border-radius: 14px;
-  border:2px solid var(--border); background:#fff;
+/* 只影響申請類彈窗的輸入欄位尺寸與字級（避免被卡住/溢出） */
+#req-card input,
+#req-card select,
+#req-card textarea{
+  height: clamp(40px, 6vh, 52px);
+  font-size: clamp(15px, 3.6vw, 17px);
+  line-height: 1.2;
+  padding: 10px 12px;
+  border-radius: 14px;
 }
-#req-card input::placeholder, #req-card textarea::placeholder{
-  font-size: clamp(14px, 3.6vw, 16px); opacity:.65;
+
+/* 彈窗內 placeholder 再小一點，避免擠位 */
+#req-card input::placeholder,
+#req-card textarea::placeholder{
+  font-size: clamp(13px, 3.4vw, 15px);
+  opacity: .65;
 }
+
 
 /* 彈窗中的兩欄（補卡日期/時間） */
 #req-card .row.two{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
@@ -433,7 +442,7 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <!-- Modal -->
 <div id="req-modal" style="display:none">
   <div id="req-mask" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100"></div>
-  <div id="req-card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,96vw);max-height:94vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:101">
+<div id="req-card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,92vw);max-height:86dvh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:101">
     <div class="hd" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
       <h3 id="req-title" style="margin:0;font-size:18px">—</h3>
       <button id="req-close" class="btn">關閉</button>
@@ -1142,7 +1151,9 @@ document.addEventListener("DOMContentLoaded", ()=>{ const el = document.getEleme
 
 (function resizeReqCard(){
   var card = document.getElementById('req-card'); if(!card) return;
-  card.style.width = 'min(400px, 60vw)'; card.style.maxHeight = '80dvh'; card.style.minHeight = 'min(400px, 60dvh)';
+  card.style.width = 'min(520px, 92vw)';
+  card.style.maxHeight = '86dvh';
+  card.style.minHeight = 'min(380px, 50dvh)';
 })();
 
 /* ============ 浮動工具面板：可開可關（再次點齒輪即可收回） ============ */
