@@ -1036,111 +1036,111 @@ document.getElementById('btn-help')?.addEventListener('click', function(){
   }
 
  function loadMyRequests(showModal){
-  const uid  = document.getElementById('uid')?.value.trim();
-  const pass = document.getElementById('pass')?.value.trim();
+    const uid  = document.getElementById('uid')?.value.trim();
+    const pass = document.getElementById('pass')?.value.trim();
+    const setDot = (data)=>{
+      const dot = document.getElementById('bell-dot'); if(!dot) return;
+      let warn=false; if(data && data.counts){ const p=+data.counts.pending||0; const r=+data.counts.rejected||0; warn=(p+r)>0; }
+      dot.classList.toggle('show', warn);
+    };
+    if(!uid || !pass){ setDot(null); if(showModal) alert('請先輸入 UID 與 PASSCODE'); return; }
 
-  // 小紅點：根據 pending / rejected 判斷
-  const setDot = (data)=>{
-    const dot = document.getElementById('bell-dot'); if(!dot) return;
-    let warn=false; 
-    if(data && data.counts){
-      const p=+data.counts.pending||0; 
-      const r=+data.counts.rejected||0; 
-      warn=(p+r)>0;
+    if (showModal){
+      const body  = document.getElementById('req-body');
+      const title = document.getElementById('req-title');
+      if (body && title){ title.textContent='我的申請'; body.textContent='載入中…'; document.getElementById('req-modal').style.display=''; }
     }
-    dot.classList.toggle('show', warn);
-  };
+     // === 同時競爭版：新版與舊版同時呼叫，誰先回就採用 ===
+  let done = false;  // 標記是否已經成功回傳一次
 
-  if(!uid || !pass){ 
-    setDot(null); 
-    if(showModal) alert('請先輸入 UID 與 PASSCODE'); 
-    return; 
-  }
-
-  // 先開啟 Modal 並顯示載入中文字
-  if (showModal){
-    const body  = document.getElementById('req-body');
-    const title = document.getElementById('req-title');
-    if (body && title){
-      title.textContent='我的申請';
-      body.textContent='載入中…';
-      document.getElementById('req-modal').style.display='';
-    }
-  }
-
-  let settled = false;                                  // 一旦真正完成就不再變動
-  const finish = (pack, err)=>{
-    if (settled) return;
-    settled = true;
-    clearTimeout(fallbackTimer);
-    clearTimeout(finalTimeout);
-
-    if (err){
+  function finish(pack, err){
+    if(done) return;
+    done = true;
+    clearTimeout(watchdog);
+    if(err){
       setDot(null);
-      if (showModal){
-        const body = document.getElementById('req-body');
-        if (body){
-          body.innerHTML =
-            '<div style="color:#b91c1c;font-weight:700">讀取失敗</div>' +
-            '<div class="muted" style="margin-top:6px">訊息：'+(err.message||String(err))+'</div>';
+      if(showModal){
+        const body=document.getElementById('req-body');
+        if(body){
+          body.innerHTML='<div style="color:#b91c1c;font-weight:700">讀取失敗</div><div class="muted" style="margin-top:6px">訊息：'+(err.message||String(err))+'</div>';
         }
-      }else{
-        alert('讀取失敗：' + (err.message || String(err)));
+      } else {
+        alert('讀取失敗：'+(err.message||String(err)));
       }
       return;
     }
-
     setDot(pack);
-    if (showModal) openRequestsModal(pack);
-  };
-
-  // ⛑ 備援：舊 API（把資料轉同樣結構後丟給 finish）
-  function runLegacy(){
-    if (settled) return;
-    google.script.run
-      .withSuccessHandler(r=>{
-        if (settled) return;
-        const items  = Array.isArray(r?.rows) ? r.rows : (Array.isArray(r) ? r : []);
-        const counts = { pending:0, approved:0, rejected:0 };
-        items.forEach(it=>{
-          const s=String(it.status||it.state||'').toLowerCase();
-          if(s==='pending') counts.pending++;
-          else if(s==='approved') counts.approved++;
-          else if(s==='rejected') counts.rejected++;
-        });
-        finish({ ok:true, counts, items }, null);
-      })
-      .withFailureHandler(err=>{
-        if (settled) return;
-        finish(null, err);
-      })
-      .listMyRequests(uid);
+    if(showModal) openRequestsModal(pack);
   }
 
-  // 🕐 2.5 秒還沒回就自動啟動備援（避免一直停在「載入中…」）
-  const fallbackTimer = setTimeout(()=>{ if(!settled) runLegacy(); }, 2500);
+  // 顯示載入中文字（避免空白）
+  if (showModal) {
+    const body = document.getElementById('req-body');
+    const title = document.getElementById('req-title');
+    if (body && title) {
+      title.textContent = '我的申請';
+      body.innerHTML = '<div class="muted">載入中…請稍候</div>';
+      document.getElementById('req-modal').style.display = '';
+    }
+  }
 
-  // ⏲ 最終逾時（再給 8 秒，總等待大約 10.5 秒）
-  const finalTimeout  = setTimeout(()=>{ if(!settled) finish(null, new Error('讀取逾時')); }, 10500);
+  // 最終逾時保險
+  const watchdog = setTimeout(()=>{ finish(null, new Error('讀取逾時')); },15000);
 
-  // ⭐ 主要：新版安全 API
+  // === 兩個 API 同時丟 ===
   google.script.run
-    .withSuccessHandler(ret=>{
-      if (settled) return;
-      // 回來了但格式無效／ok=false → 立刻走備援，不要卡住
-      if (!ret || ret.ok === false){ 
-        runLegacy();
-        return;
-      }
-      finish(ret, null);
+    .withSuccessHandler(ret => {
+      if(!ret || ret.ok===false){ return; }
+      finish(ret,null);
     })
-    .withFailureHandler(_err=>{
-      // 主要呼叫失敗 → 立刻走備援（不要只 console.warn）
-      if (!settled) runLegacy();
-    })
+    .withFailureHandler(err => { finish(null, err); })
     .getMyRequestsSecure(uid, pass);
+
+  google.script.run
+    .withSuccessHandler(r => {
+      // 把舊版資料格式轉成統一格式
+      const items = Array.isArray(r?.rows) ? r.rows : (Array.isArray(r) ? r : []);
+      const counts = { pending:0, approved:0, rejected:0 };
+      items.forEach(it => {
+        const s = String(it.status||it.state||'').toLowerCase();
+        if(s==='pending') counts.pending++;
+        else if(s==='approved') counts.approved++;
+        else if(s==='rejected') counts.rejected++;
+      });
+      finish({ ok:true, counts, items }, null);
+    })
+    .withFailureHandler(err => { finish(null, err); })
+    .listMyRequests(uid);
 }
 
+    let settled=false;
+    const finish=(pack,err)=>{ if(settled) return; settled=true; clearTimeout(watchdog);
+      if(err){ setDot(null); if(showModal){ const body=document.getElementById('req-body'); if(body){ body.innerHTML='<div style="color:#b91c1c;font-weight:700">讀取失敗</div><div class="muted" style="margin-top:6px">訊息：'+(err.message||String(err))+'</div>'; } } else { alert('讀取失敗：'+(err.message||String(err))); } return; }
+      setDot(pack); if(showModal) openRequestsModal(pack);
+    };
+    const watchdog=setTimeout(()=>{ finish(null,new Error('讀取逾時')); },15000);
+
+    google.script.run
+      .withSuccessHandler(ret=>{ if(!ret || ret.ok===false){ return; } finish(ret,null); })
+      .withFailureHandler(err=>{ console.warn('getMyRequestsSecure 失敗，改用 listMyRequests：',err); })
+      .getMyRequestsSecure(uid, pass);
+
+    setTimeout(()=>{ if(settled) return;
+      google.script.run
+        .withSuccessHandler(r=>{ if(settled) return;
+          const items  = Array.isArray(r?.rows) ? r.rows : (Array.isArray(r) ? r : []);
+          const counts = { pending:0, approved:0, rejected:0 };
+          items.forEach(it=>{ const s=String(it.status||it.state||'').toLowerCase(); if(s==='pending') counts.pending++; else if(s==='approved') counts.approved++; else if(s==='rejected') counts.rejected++; });
+          finish({ ok:true, counts, items }, null);
+        })
+        .withFailureHandler(err=>{ if(settled) return; finish(null, err); })
+        .listMyRequests(uid);
+    },6000);
+  }
+  document.getElementById('btn-bell')?.addEventListener('click', ()=>loadMyRequests(true));
+  window.addEventListener('load', ()=>setTimeout(()=>loadMyRequests(false), 1000));
+
+  window.addEventListener('load', function(){ setTimeout(function(){ safeRefresh(false); }, 300 + Math.random()*3000); });
 
 })(); // 主 IIFE end
 
