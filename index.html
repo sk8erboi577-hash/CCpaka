@@ -343,6 +343,51 @@ body.is-freeze{ overflow:hidden; }
 
 /* Toast 與 FAB 之間的安全距離（有齒輪時） */
 body:has(#fab-tools){ --fab-clearance: 80px; }
+  /* ===== 只修「彈窗」顯示範圍與欄位排版（不影響其他地方） ===== */
+/* 外層容器：固定在畫面上 */
+#req-modal{ position:fixed; inset:0; display:none; z-index:10000; }
+
+/* 背景遮罩 */
+#req-mask{ position:absolute; inset:0; background:rgba(0,0,0,.35); }
+
+/* 內容卡片：寬度/高度更保守，手機不會被卡住；可滾動 */
+#req-card{
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width: min(560px, 92vw);                 /* 以前太寬 → 收斂 */
+  max-height: 86dvh;                        /* 以前太高 → 收斂 */
+  overflow: auto; -webkit-overflow-scrolling: touch;
+  background:#fff; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.2);
+  padding:18px 18px 20px; box-sizing:border-box;
+}
+
+/* 標題列：保留你的按鈕樣式，但內距更緊 */
+#req-card .hd{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+#req-title{ margin:0; font-size:18px; }
+
+/* 彈窗內的欄位尺寸（不吃外面大字/大高的規則） */
+#req-card input, #req-card select, #req-card textarea{
+  height: clamp(44px, 6.5vh, 56px);
+  font-size: clamp(16px, 3.8vw, 18px);
+  line-height: 1.2;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+/* 兩欄列：像「日期/時間」那種，不會換行擠爆；小螢幕會自動斷行 */
+#req-card .row{ display:flex; gap:10px; flex-wrap:wrap; }
+#req-card .row > *{ flex:1 1 0; min-width: 0; }
+
+/* label 單行時也能撐滿；小螢幕不會溢出 */
+#req-card label{ display:block; width:100%; }
+
+/* 送出列：靠右、保持按鈕不被邊緣吃掉 */
+#req-card .actions{ text-align:right; margin-top:8px; }
+
+/* iOS 鍵盤彈出時避免上下被擠：讓卡片仍可滾動 */
+@supports (height: 100svh){
+  #req-card{ max-height: 86svh; }
+}
+
 </style>
 
 
@@ -372,7 +417,7 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
     <div class="row">
       <input id="uid" type="text" placeholder="UID">
       <input id="pass" type="password" placeholder="PASSCODE">
-      <button id="btn-query" class="btn btn-ghost" title="不打卡、只查詢今日資料">🔎 查詢今日</button>
+      <button id="btn-query" class="btn btn-ghost" title="不打卡、只查詢今日資料">🔎</button>
     </div>
   </div>
 
@@ -405,16 +450,16 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 
 <!-- Modal -->
 <div id="req-modal" style="display:none">
-  <div id="req-mask" style="position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100"></div>
-  <div id="req-card" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:min(900px,96vw);max-height:94vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.2);z-index:101">
-    <div class="hd" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <h3 id="req-title" style="margin:0;font-size:18px">—</h3>
+  <div id="req-mask"></div>
+
+  <div id="req-card">
+    <div class="hd">
+      <h3 id="req-title">—</h3>
       <button id="req-close" class="btn">關閉</button>
     </div>
     <div id="req-body"></div>
   </div>
 </div>
-
 <!-- Freeze -->
 <div id="freeze-mask"><div class="box">處理中…</div></div>
 
@@ -1115,7 +1160,10 @@ document.addEventListener("DOMContentLoaded", ()=>{ const el = document.getEleme
 
 (function resizeReqCard(){
   var card = document.getElementById('req-card'); if(!card) return;
-  card.style.width = 'min(400px, 60vw)'; card.style.maxHeight = '80dvh'; card.style.minHeight = 'min(400px, 60dvh)';
+  // 與 CSS 保持一致（避免被外層大尺寸蓋掉而溢出）
+  card.style.width = 'min(560px, 92vw)';
+  card.style.maxHeight = '86dvh';
+  card.style.minHeight = '';               // 不強制最小高度，讓內容自己撐
 })();
 
 /* ============ 浮動工具面板：可開可關（再次點齒輪即可收回） ============ */
