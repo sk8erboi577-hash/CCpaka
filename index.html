@@ -269,7 +269,7 @@ body.is-freeze{ overflow:hidden; }
 /* 面板內每顆功能鈕 */
 .tool-btn{
   height: clamp(56px, 9vh, 82px);
-  font-size: clamp(18px, 4.6vw, 24px);
+  font-size: clamp(24px, 5vw, 28px);
   border-radius: 12px;
   border: 2px solid var(--border);
   display:flex; align-items:center; justify-content:center;
@@ -373,10 +373,6 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
       <input id="uid" type="text" placeholder="UID">
       <input id="pass" type="password" placeholder="PASSCODE">
       <button id="btn-query" class="btn btn-ghost" title="不打卡、只查詢今日資料">🔎 查詢今日</button>
-    </div>
-    <div class="row">
-      <button id="btn-loc" class="btn btn-ghost">🚩 取得定位</button>
-      <div id="locChip" class="loc-line muted" style="flex:1">ℹ️ 打卡時會自動取得當下定位</div>
     </div>
   </div>
 
