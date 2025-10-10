@@ -6,236 +6,345 @@
 <title>打卡系統</title>
 
 <style>
-/* =============== 基本配色/排版 =============== */
+/* ============================================================================
+  0) 基本變數（色票 / 尺寸）
+============================================================================ */
 :root{
-  --primary:#16a34a; --secondary:#3b82f6; --leave:#9333ea; --trip:#06b6d4; --corr:#f59e0b;
-  --border:#2f3a49; --muted:#6b7280; --chip:#e5e7eb; --card:#ffffff; --bg:#f6f8fb; --maxw:1200px;
+  --primary:#16a34a;      /* 上班打卡主色 */
+  --secondary:#3b82f6;    /* 下班 / 次要色 */
+  --leave:#9333ea;        /* 請假 */
+  --trip:#06b6d4;         /* 出差 */
+  --corr:#f59e0b;         /* 補卡 */
+  --border:#2f3a49;       /* 全站邊線顏色 */
+  --muted:#6b7280;        /* 次要文字 */
+  --chip:#e5e7eb;         /* 徽章底色 */
+  --card:#ffffff;         /* 卡片背景 */
+  --bg:#f6f8fb;           /* 頁面背景 */
+  --maxw:1200px;          /* 內容最大寬 */
 }
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);font: clamp(16px,2.4vw,18.5px)/1.65 system-ui,-apple-system,"Noto Sans TC",Segoe UI,Roboto,Arial}
-.wrap{max-width:min(var(--maxw),100vw);margin:0 auto;min-height:100dvh;padding: clamp(8px, 2vw, 14px)}
-.grid{display:grid;gap: clamp(8px, 2vw, 12px)}
-.row{display:flex;gap: clamp(8px, 2vw, 12px);flex-wrap:wrap}
-.row-lg{display:flex;justify-content:space-between;gap: clamp(10px,2.5vw,16px);margin-bottom:6px}
-h1{margin:6px 0 14px;font-size:clamp(18px,2.6vw,22px)}
 
-/* =============== 表單/按鈕/卡片 =============== */
-input,button,select,textarea{font:inherit}
+/* ============================================================================
+  1) Reset / Base
+============================================================================ */
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background:var(--bg);
+  font: clamp(16px,2.4vw,18.5px)/1.6 system-ui,-apple-system,"Noto Sans TC",Segoe UI,Roboto,Arial;
+}
+.wrap{
+  max-width:min(var(--maxw),100vw);
+  margin:0 auto;
+  min-height:100dvh;
+  padding: clamp(8px, 2vw, 14px);
+}
+h1{ margin:6px 0 14px; font-size:clamp(18px,2.6vw,22px); }
+
+/* ============================================================================
+  2) 通用排版工具
+============================================================================ */
+.grid{ display:grid; gap: clamp(8px, 2vw, 12px); }
+.row{ display:flex; gap: clamp(8px, 2vw, 12px); flex-wrap:wrap; }
+.row-lg{ display:flex; justify-content:space-between; gap: clamp(10px,2.5vw,16px); margin-bottom:6px; }
+.main-grid{ display:block; width:100%; margin:0; padding:0; }
+.main-grid .grid.h-100{ width:100%; }
+.muted{ color:var(--muted); }
+.badge{ display:inline-block; padding:4px 12px; border-radius:999px; background:var(--chip); font-size:.92em; }
+.title{ display:flex; align-items:center; justify-content:space-between; margin:6px 0 10px; }
+
+/* ============================================================================
+  3) 表單與按鈕（UID / PASS / 查詢 / 一般按鈕）
+============================================================================ */
+input,button,select,textarea{ font:inherit; }
 input[type="text"],input[type="password"],select,textarea{
-  flex:1 1 220px;height: clamp(90px,7.5vh,96px);padding:12px 14px;border:2px solid var(--border);
-  border-radius:20px;background:#fff
+  flex:1 1 220px;
+  height: clamp(56px, 8vh, 64px);      /* 行動端的實際高度 */
+  padding:12px 14px;
+  border:2px solid var(--border);
+  border-radius:14px;
+  background:#fff;
 }
-.btn{height: clamp(30px,6.7vh,58px);padding:0 clamp(12px,2vw,18px);border:2px solid var(--border);
-  border-radius:16px;cursor:pointer;background:#fff;font-weight:700;letter-spacing:.02em}
-.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn-secondary{background:var(--secondary);border-color:var(--secondary);color:#fff}
-.btn-leave{background:var(--leave);border-color:var(--leave);color:#fff}
-.btn-trip{background:var(--trip);border-color:var(--trip);color:#fff}
-.btn-corr{background:var(--corr);border-color:var(--corr);color:#fff}
-.btn-ghost{background:#fff}
+/* 登入列（UID / PASS / 查詢）不換行，三格排一排 */
+.card .row:first-child{ align-items:stretch; flex-wrap:nowrap !important; overflow:hidden; }
+#uid,#pass,input#uid,input#pass{ flex:1 1 30% !important; min-width:0; }
 
-.card{background:var(--card);border:2px solid var(--border);border-radius:18px;
-  padding: clamp(12px,1.8vw,18px);height:100%;width:100%}
-.title{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
-.muted{color:var(--muted)}
-.badge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--chip);font-size:.92em}
-
-/* 標題（摘要/明細統一） */
-.card .title strong{
-  font-size: clamp(20px, 4.6vw, 24px);
-  line-height:1.2;
-}
-.card .title .muted{
-  font-size: clamp(14px, 3.6vw, 16px);
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+/* 查詢今日（文字略大、與輸入同高） */
+#btn-query,#btnQueryToday{
+  flex:1 1 0% !important;
+  height: clamp(56px, 8vh, 64px) !important;
+  padding:0 12px !important;
+  font-weight:800;
+  font-size: clamp(18px, 4.4vw, 22px) !important;
+  line-height:1.05;
+  border:2px solid var(--border);
+  border-radius:14px !important;
+  background:#fff;
+  white-space:nowrap; text-overflow:ellipsis; overflow:hidden;
 }
 
-/* 版本號角標（縮小） */
+/* 通用按鈕基礎（小按鈕/彈窗用） */
+.btn{
+  height: clamp(42px,6.5vh,52px);
+  padding:0 clamp(12px,2vw,18px);
+  border:2px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
+  background:#fff;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.btn-primary{ background:var(--primary); border-color:var(--primary); color:#fff; }
+.btn-secondary{ background:var(--secondary); border-color:var(--secondary); color:#fff; }
+.btn-leave{ background:var(--leave); border-color:var(--leave); color:#fff; }
+.btn-trip{ background:var(--trip); border-color:var(--trip); color:#fff; }
+.btn-corr{ background:var(--corr); border-color:var(--corr); color:#fff; }
+
+/* 互動動畫（全站一致） */
+button,.btn,.tool-btn,.fab,.bell-btn,#btn-in,#btn-out,#btnMore,#btn-query,[role="button"],.clickable{
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+  transform-origin:center;
+}
+button:hover,.btn:hover,.tool-btn:hover,.fab:hover,.bell-btn:hover,#btn-in:hover,#btn-out:hover,#btnMore:hover,#btn-query:hover{
+  transform:scale(1.05);
+  box-shadow:0 6px 16px rgba(0,0,0,.16);
+}
+button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:active,#btn-out:active,#btnMore:active,#btn-query:active{
+  transform:scale(.96);
+  box-shadow:0 4px 12px rgba(0,0,0,.20);
+}
+
+/* ============================================================================
+  4) 卡片 / 版本徽章 / 時鐘列
+============================================================================ */
+.card{
+  background:var(--card);
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding: clamp(12px,1.8vw,18px);
+  height:100%; width:100%;
+}
+
+/* 版本徽章（你說要小一點） */
 .version-badge{
-  font-size: clamp(12px, 3.2vw, 14px);
-  margin-left:10px; padding:8px 10px; border-radius:8px;
-  background:var(--chip); color:var(--muted)
+  font-size: clamp(12px, 3.2vw, 14px);   /* 主要調小在這 */
+  margin-left:10px;
+  padding:8px 10px;
+  border-radius:8px;
+  background:var(--chip);
+  color:var(--muted);
 }
 
-/* 時鐘盒（邊線變薄 + padding縮） */
+/* 現在時間卡（你說邊框太厚 → 改 1px） */
 .clock{
-  border:1px solid var(--border);
+  border:1px solid var(--border);        /* 原 2px → 1px */
   border-radius:14px;
   padding:8px 12px;
   background:#fff;
-  font-weight:800
+  font-weight:800;
 }
 
-/* 主區域單欄 */
-.main-grid{display:block;width:100%;margin:0;padding:0}
-.main-grid .grid.h-100{width:100%}
-
-/* 今日明細列表 */
-#todayList .recentItem{
-  display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;
-  min-height: clamp(42px,6vh,52px);font-size:.95em
-}
-.type-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:.92em;font-weight:700;line-height:1;background:#e5e7eb;color:#111827}
-.type-pill.in{background:#dcfce7;color:#166534}
-.type-pill.out{background:#dbeafe;color:#1d4ed8}
-
-/* 巨型上下班鍵（PWA 仍保留大按鈕） */
+/* ============================================================================
+  5) 上/下班打卡兩顆大鈕（維持既有大尺寸）
+============================================================================ */
 #btn-in,#btn-out{
-  height:20vh !important;font-size:min(9vw,10vh) !important;font-weight:900;line-height:1.06 !important;
-  border-width:3px;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:0;flex:1;min-width:45%;
-  white-space:nowrap;overflow:hidden;transition-duration:.18s !important;
-}
-
-/* 冷凍遮罩 */
-#freeze-mask{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.75);backdrop-filter:saturate(.6) blur(2px);z-index:9999}
-#freeze-mask .box{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px 18px;font-weight:900;font-size:48px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-body.is-freeze{overflow:hidden}
-#btn-loc,#locChip{display:none !important}
-
-/* 🔔/🔊 漂浮按鈕 */
-.bell-btn{position: fixed; right: 14px; top: 14px; z-index: 999;
-  width: 66px; height: 66px; border-radius: 80%; border: 2px solid var(--border);
-  background:#fff; cursor:pointer; font-size: 40px; display:flex; align-items:center; justify-content:center;
-  box-shadow: 0 6px 18px rgba(0,0,0,.12)}
-.bell-btn:active{ transform: translateY(1px); }
-.bell-dot{position:absolute; right:-2px; top:-2px; width:12px; height:12px;background:#ef4444; border:2px solid #fff; border-radius:999px; display:none}
-.bell-dot.show{ display:block; }
-#btn-sound{ right:92px; width:56px; height:56px; font-size:32px; }
-@media (max-width:480px){
-  #btn-sound{ right:84px; width:50px; height:50px; font-size:28px; }
-}
-
-/* 申請列表 */
-.req-chip{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; margin-left:6px }
-.req-pending{ background:#e5e7eb; color:#374151 }
-.req-approved{ background:#dcfce7; color:#166534 }
-.req-rejected{ background:#fee2e2; color:#b91c1c }
-.req-list{ display:grid; gap:8px }
-.req-item{ border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; background:#fff }
-.req-item h5{ margin:0 0 4px; font-size:14px }
-.req-item .meta{ color:#6b7280; font-size:12px }
-
-/* ======= 登入列：固定同一排，不換行（UID / PASS / 查詢今日） ======= */
-.card .row:first-child{
-  align-items:stretch;
-  flex-wrap: nowrap !important;   /* 不換行 */
-  overflow: hidden;               /* 保障不擠出第二列 */
-}
-.card .row:first-child > *{ min-width:0; }
-
-/* 欄位比例：兩個輸入各 ~26%，按鈕吃剩餘 */
-#uid, #pass, input#uid, input#pass{
-  flex: 1 1 30% !important;
-  width:auto !important; max-width:none !important;
-  height: clamp(56px, 8vh, 64px) !important;
-  font-size: clamp(18px, 4.4vw, 22px) !important;
-}
-#uid::placeholder, #pass::placeholder{
-  font-size: clamp(18px, 4.4vw, 22px) !important;
-  font-weight:600; letter-spacing:.5px; color:#9ca3af;
-}
-
-/* 查詢今日按鈕（與輸入同高、可縮） */
-#btnQueryToday, #btn-query{
-  flex: 1 1 24% !important;
-  min-width:0 !important;
-  height: clamp(56px, 8vh, 64px) !important;
-  border-radius:14px !important; border:2px solid var(--border);
-  background:#fff; padding:0 10px !important; line-height:1;
+  height: clamp(72px, 14vh, 120px) !important;
+  font-size: clamp(40px, 7vw, 48px) !important;
+  font-weight:900;
+  line-height:1.06 !important;
+  border-width:3px;
+  border-radius:14px;
   display:flex; align-items:center; justify-content:center;
-  font-weight:800; font-size: clamp(18px, 4.4vw, 22px) !important;
+  padding:0; flex:1; min-width:45%;
+  white-space:nowrap; overflow:hidden;
+}
+
+/* ============================================================================
+  6) 今日摘要 / 今日明細（標題字級統一）
+============================================================================ */
+/* 統一標題字級：摘要 / 明細 → 同一套尺寸 */
+.card .title strong,
+.details-card .title strong{
+  font-size: clamp(20px, 4.6vw, 24px) !important;
+  line-height:1.2 !important;
+}
+/* 右上角的小字（例如「只顯示最近 3 筆」） */
+.card .title .muted,
+.details-card .title .muted{
+  font-size: clamp(14px, 3.6vw, 16px) !important;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-#btnQueryToday:hover, #btnQueryToday:active, #btn-query:hover, #btn-query:active{
-  transform: scale(1.02); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6; transition:.18s cubic-bezier(.2,.9,.3,1.4);
-}
 
-/* 顯示更多按鈕（不爆版） */
+/* 今日明細列每一筆的樣式 */
+#todayList .recentItem{
+  display:grid;
+  grid-template-columns:auto auto 1fr auto;
+  gap:10px; align-items:center;
+  min-height: clamp(42px,6vh,52px);
+  font-size:.95em;
+}
+.type-pill{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 12px; border-radius:999px;
+  font-size:.92em; font-weight:700; line-height:1;
+  background:#e5e7eb; color:#111827;
+}
+.type-pill.in{ background:#dcfce7; color:#166534; }
+.type-pill.out{ background:#dbeafe; color:#1d4ed8; }
+
+/* 顯示更多按鈕（尺寸適中） */
 #btnMore, button#btnMore{
-  display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
-  min-height:48px; min-width:140px; font-size: clamp(20px, 4.2vw, 22px);
-  padding: 12px 18px; border-radius:14px; font-weight:800; letter-spacing:.02em;
-  background:#fff; border:2px solid var(--border); transition: all .2s ease-in-out;
-}
-#btnMore:hover, #btnMore:active{ transform: scale(1.05); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6; }
-
-/* Busy 遮罩 */
-.busy-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:9999}
-.busy-mask.hidden{display:none}
-.busy-inner{min-width:220px;max-width:80vw;background:#111;color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;gap:12px;align-items:center}
-.spinner{width:22px;height:22px;border-radius:50%;border:3px solid #fff;border-top-color:transparent;animation:spin 1s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.busy-inner .msg{font-size:15px;line-height:1.3}
-
-/* 浮動工具面板 */
-.fab{ position: fixed; right: 18px; bottom: 18px; width:75px; height:75px; border-radius:50%;
-  background:var(--secondary); color:#fff; font-size:40px; border:none; box-shadow:0 8px 20px rgba(0,0,0,.25);
-  display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10002; transition:.25s}
-.fab:hover{ transform:scale(1.05); background:#2563eb; }
-#tool-panel{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:720px;
-  background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -10px 30px rgba(0,0,0,.25); transition:transform .3s; z-index:10001;
-  padding:18px 16px 24px; display:grid; grid-template-columns:1fr 1fr; gap:20px}
-#tool-panel.show{ transform:translateX(-50%) translateY(0); }
-#tool-mask{ position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none }
-#tool-mask.show{ display:block }
-.tool-btn{ height:60px; border-radius:14px; border:2px solid var(--border); font-weight:900; font-size:75px;
-  display:flex; align-items:center; justify-content:center; gap:6px; color:#fff }
-.tool-leave{ background:var(--leave); border-color:var(--leave) }
-.tool-trip{ background:var(--trip); border-color:var(--trip) }
-.tool-corr{ background:var(--corr); border-color:var(--corr) }
-.tool-cal,.tool-refresh,.tool-help{ background:#f3f4f6; color:#111 }
-.tool-help{ border-color:#d1d5db }
-
-/* ======= 內容滾動修正 ======= */
-.main-grid{ flex: initial !important; display:block !important }
-.main-grid .grid.h-100{ display:grid !important; grid-auto-rows:auto }
-.card:has(#todayList), .card:has(#sumIn){ display:block !important }
-#todayList{ overflow: visible !important; min-height:0 !important; -webkit-overflow-scrolling:auto !important }
-.wrap::after{ content:""; display:block; height:1px }
-
-/* ======= Toast ======= */
-.toast-stack{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%);
-  z-index:11000; display:grid; gap:12px; pointer-events:none; width:100%; max-width:min(90vw,720px) }
-.toast{ width:100%; color:#fff; background:#16a34a; padding: clamp(14px, 3.4vw, 22px) clamp(18px, 4.0vw, 28px);
-  border-radius:16px; font-weight:900; font-size: clamp(28px, 6vw, 32px); line-height:1.25; text-align:center;
-  box-shadow:0 14px 34px rgba(0,0,0,.28); opacity:0; transform:translate(-50%,12px) scale(.98);
-  transition: opacity .28s ease, transform .28s ease; will-change:opacity, transform; position:relative; left:50% }
-.toast.show{ opacity:1; transform:translate(-50%,0) scale(1) }
-.toast.warn{ background:#f59e0b } .toast.err{ background:#b91c1c }
-.toast .sub{ display:block; font-weight:700; opacity:.95; margin-top:.25em; font-size:.9em }
-@media (max-width:520px){ .toast{ border-radius:14px } }
-body:has(#fab-tools){ --fab-clearance:96px } .toast-stack{ margin-bottom:var(--fab-clearance,0) }
-
-/* ======= RWD 微調 ======= */
-@media (max-width:820px){
-  /* 上下班鍵略降尺寸更像 App */
-  #btn-in,#btn-out{ height: clamp(72px, 14vh, 120px) !important; font-size: clamp(40px, 7vw, 48px) !important; border-radius:14px !important }
-  /* 時鐘更精緻 */
-  #clock{ font-size: clamp(18px, 4.6vw, 24px) !important; padding:10px 12px !important }
-  /* 鈴鐺/喇叭縮一格，避免壓到圓角 */
-  .bell-btn{ right: 8px; top: 8px; width: 44px; height: 44px; font-size: 22px }
-  #btn-sound{ right:56px; width:40px; height:40px; font-size:20px }
-  /* 卡片圓角收斂 */
-  .card{ border-radius:14px !important }
+  display:inline-flex; align-items:center; justify-content:center;
+  min-height:48px; min-width:140px;
+  font-size: clamp(18px, 3.8vw, 20px) !important;
+  padding: 10px 16px !important;
+  border-radius:12px !important;
+  font-weight:800; letter-spacing:.02em;
+  background:#fff !important; border:2px solid var(--border) !important;
 }
 
-/* ======= 互動動畫（全站） ======= */
-button,.btn,.tool-btn,.fab,.bell-btn,#btn-in,#btn-out,#btnMore,#btnQueryToday,#btn-query,[role="button"],.clickable{
-  -webkit-tap-highlight-color:transparent; will-change:transform;
-  transition:transform .18s ease-in-out, box-shadow .18s ease-in-out, filter .18s ease-in-out, background-color .18s ease-in-out;
-  transform-origin:center; cursor:pointer;
+/* ============================================================================
+  7) 浮動通知鈴鐺 / 音效切換
+============================================================================ */
+.bell-btn{
+  position: fixed; right: 14px; top: 14px; z-index: 999;
+  width: 48px; height: 48px; border-radius: 50%;
+  border: 2px solid var(--border); background:#fff;
+  font-size: 26px; display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12);
 }
-button:hover,.btn:hover,.tool-btn:hover,.fab:hover,.bell-btn:hover,#btn-in:hover,#btn-out:hover,#btnMore:hover,#btnQueryToday:hover,#btn-query:hover,[role="button"]:hover,.clickable:hover{
-  transform:scale(1.06); box-shadow:0 6px 18px rgba(0,0,0,.18)
-}
-button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:active,#btn-out:active,#btnMore:active,#btnQueryToday:active,#btn-query:active,[role="button"]:active,.clickable:active{
-  transform:scale(.96); box-shadow:0 4px 12px rgba(0,0,0,.22); filter:brightness(1.04)
-}
-@keyframes pulse{ 0%{transform:scale(1);box-shadow:0 0 0 rgba(0,0,0,0)} 40%{transform:scale(1.12);box-shadow:0 10px 24px rgba(0,0,0,.18)} 100%{transform:scale(1);box-shadow:0 0 0 rgba(0,0,0,0)} }
-.btn-pulse{ animation:pulse .26s ease }
+.bell-dot{ position:absolute; right:-2px; top:-2px; width:12px; height:12px; background:#ef4444; border:2px solid #fff; border-radius:999px; display:none; }
+.bell-dot.show{ display:block; }
 
+/* 音效鈕放在鈴鐺左邊一點、稍小 */
+#btn-sound{
+  position: fixed; right: 68px; top: 16px; z-index: 999;
+  width: 42px; height: 42px; font-size: 22px;
+  border-radius: 50%; border: 2px solid var(--border);
+  background:#fff; display:flex; align-items:center; justify-content:center;
+}
+
+/* ============================================================================
+  8) 冷凍遮罩（送資料或定位時）
+============================================================================ */
+#freeze-mask{
+  position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.75); backdrop-filter:saturate(.6) blur(2px); z-index:9999;
+}
+#freeze-mask .box{
+  background:#fff; border:2px solid var(--border); border-radius:16px;
+  padding:16px 18px; font-weight:900; font-size:48px; box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+body.is-freeze{ overflow:hidden; }
+
+/* ============================================================================
+  9) 浮動齒輪（FAB）與工具面板（你要兩欄、與卡片差不多高）
+============================================================================ */
+/* 齒輪大小（避免擋畫面） */
+.fab{
+  position: fixed; right:16px; bottom:16px; z-index:10002;
+  width:72px; height:72px; font-size:40px;
+  border:none; border-radius:50%;
+  background: var(--secondary); color:#fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
+}
+
+/* 工具面板：兩欄、按鈕高度接近卡片行距 */
+#tool-panel{
+  position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(100%);
+  width: 100%; max-width: min(760px, 94vw);
+  background:#fff; border-radius: 20px 20px 0 0;
+  box-shadow: 0 -10px 30px rgba(0,0,0,.25);
+  transition: transform .28s ease;
+  z-index: 10001;
+  padding: 14px 14px 18px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+  max-height: 72vh; overflow:auto;
+}
+#tool-panel.show{ transform: translateX(-50%) translateY(0); }
+#tool-mask{ position: fixed; inset: 0; background: rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none; }
+#tool-mask.show{ display:block; }
+
+/* 面板內每顆功能鈕 */
+.tool-btn{
+  height: clamp(56px, 9vh, 82px);
+  font-size: clamp(18px, 4.6vw, 24px);
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; color:#fff;
+}
+.tool-leave { background: var(--leave);  border-color: var(--leave); }
+.tool-trip  { background: var(--trip);   border-color: var(--trip); }
+.tool-corr  { background: var(--corr);   border-color: var(--corr); }
+.tool-cal, .tool-refresh, .tool-help { background:#f3f4f6; color:#111; border-color:#d1d5db; }
+
+/* ============================================================================
+  10) Modal（出差 / 補卡 / 請假）主要字級回到一般，不會被大鈕影響
+============================================================================ */
+#req-card input, #req-card select, #req-card textarea{
+  height: clamp(44px, 6.5vh, 56px); font-size: clamp(16px, 3.8vw, 18px);
+  line-height:1.2; padding: 10px 12px; border-radius: 14px;
+}
+#req-card input::placeholder, #req-card textarea::placeholder{
+  font-size: clamp(14px, 3.6vw, 16px); opacity:.65;
+}
+.req-list{ display:grid; gap:8px; }
+.req-item{ border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; background:#fff; }
+.req-item h5{ margin:0 0 4px; font-size:14px; }
+.req-pending{ background:#e5e7eb; color:#374151; }
+.req-approved{ background:#dcfce7; color:#166534; }
+.req-rejected{ background:#fee2e2; color:#b91c1c; }
+
+/* ============================================================================
+  11) Toast（置中提示）
+============================================================================ */
+.toast-stack{
+  position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom));
+  transform: translateX(-50%); z-index: 11000;
+  display: grid; gap: 12px; pointer-events: none;
+  width: 100%; max-width: min(90vw, 720px);
+  margin-bottom: var(--fab-clearance, 0);
+}
+.toast{
+  width: 100%; color:#fff; background:#16a34a;
+  padding: clamp(14px, 3.4vw, 22px) clamp(18px, 4.0vw, 28px);
+  border-radius: 14px; font-weight:900; font-size: clamp(24px, 5.4vw, 32px);
+  line-height:1.25; text-align:center; box-shadow: 0 14px 34px rgba(0,0,0,.28);
+  opacity: 0; transform: translate(-50%, 12px) scale(.98);
+  transition: opacity .28s ease, transform .28s ease;
+  position: relative; left: 50%;
+}
+.toast.show{ opacity:1; transform: translate(-50%,0) scale(1); }
+.toast.warn{ background:#f59e0b; }
+.toast.err{  background:#b91c1c; }
+.toast .sub{ display:block; font-weight:700; opacity:.95; margin-top:.25em; font-size:.9em; }
+
+/* ============================================================================
+  12) 響應式微調
+============================================================================ */
+@media (max-width:480px){
+  /* 鈴鐺與音效鈕略縮 */
+  .bell-btn{ right: 12px; top: 12px; width: 44px; height: 44px; font-size: 22px; }
+  #btn-sound{ right: 58px; top: 14px; width: 38px; height: 38px; font-size: 20px; }
+
+  /* 工具面板更緊湊 */
+  #tool-panel{ gap:10px; padding:12px 12px 16px; }
+  .tool-btn{ height: clamp(52px, 10vh, 74px); font-size: clamp(16px, 4.4vw, 20px); }
+  .fab{ width:64px; height:64px; font-size:34px; right:12px; bottom:12px; }
+}
+
+/* 大螢幕（桌機）面板可以稍微放大但維持兩欄 */
+@media (min-width:820px){
+  #tool-panel{ max-width: 900px; }
+  .tool-btn{ height: 90px; font-size: 26px; }
+}
+
+/* Toast 與 FAB 之間的安全距離（有齒輪時） */
+body:has(#fab-tools){ --fab-clearance: 80px; }
 </style>
+
 
 <!-- === PWA 設定 === -->
 <!-- ✅ 改成相對路徑，千萬不要用 /manifest.webmanifest -->
