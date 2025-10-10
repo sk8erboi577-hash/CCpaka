@@ -746,38 +746,91 @@ body:has(#fab-tools){
 </div>
 
 <script>
-  /* ===== Apps Script 防呆：沒有 google.script.run 就改成「假接口」避免拋錯 ===== */
+<script>
+/* ===== Apps Script 代理：在 GAS 以外（GitHub Pages）用 fetch 打你的 Web App ===== */
 (function(){
-  const hasGAS = !!(window.google && google.script && google.script.run);
+  // 這裡換成你剛部署拿到的 exec URL
+  const GAS_API = 'https://script.google.com/macros/s/AKfycbyfzVMCvEzCW6n3VWgX4N5-qF8jKLJIDm4gz4GMN6M2QjvkD-jmac31dl24BQWzNNie/exec';
 
-  // 提供一個「假 run」：保留鏈式 API，但不連任何後端，只回傳空資料
-  function makeDummyRun(){
+  // 用 x-www-form-urlencoded 避免 CORS 預檢
+  async function gas(action, payload){
+    const body = new URLSearchParams();
+    body.set('action', action);
+    body.set('payload', JSON.stringify(payload || {}));
+    const res = await fetch(GAS_API, { method:'POST', body });
+    const text = await res.text();
+    try { return JSON.parse(text); } catch(_){ return { ok:false, message:text }; }
+  }
+
+  // 包成「長得像 google.script.run」的物件（保留 withSuccessHandler / withFailureHandler）
+  function makeRun(){
     const api = {
-      _ok: null, _fail: null,
+      _ok:null, _fail:null,
       withSuccessHandler(fn){ api._ok = fn; return api; },
       withFailureHandler(fn){ api._fail = fn; return api; },
-      getTodaySummaryAndListSecure(){ api._ok && api._ok({ summary:{}, list:[] }); },
-      getMyRequestsSecure(){ api._ok && api._ok({ ok:true, counts:{pending:0, approved:0, rejected:0}, items:[] }); },
-      listMyRequests(){ api._ok && api._ok({ rows:[] }); },
-      saveEvent(){ api._ok && api._ok({ ok:false, message:'Demo (GitHub Pages) 無法連到 Apps Script' }); },
-      requestTripSimple(){ api._ok && api._ok({ ok:false }); },
-      requestCorrectionSimple(){ api._ok && api._ok({ ok:false }); },
-      rebuildCalendarSecure(){ api._ok && api._ok({ ok:true }); }
+
+      // 你的現有前端呼叫，一個不漏對上
+      getTodaySummaryAndListSecure(uid, pass){
+        gas('get_today', { uid, pass })
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      getMyRequestsSecure(uid, pass){
+        gas('my_requests', { uid, pass })
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      listMyRequests(uid){
+        // 舊版備援（如果你前端還會叫到）
+        gas('my_requests', { uid, pass:'' })
+          .then(r => {
+            // 讓舊版介面吃得下：轉成 {rows:[]}
+            const rows = Array.isArray(r?.items) ? r.items : (Array.isArray(r?.rows) ? r.rows : []);
+            api._ok && api._ok({ rows });
+          })
+          .catch(e => api._fail && api._fail(e));
+      },
+      saveEvent(payload){
+        gas('save_event', payload)
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      requestTripSimple(payload){
+        gas('request_trip', payload)
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      requestCorrectionSimple(payload){
+        gas('request_correction', payload)
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      saveLeave(payload){
+        gas('save_leave', payload)
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      },
+      rebuildCalendarSecure(uid, pass, year, month){
+        gas('rebuild_calendar', { uid, pass, year, month })
+          .then(r => api._ok && api._ok(r))
+          .catch(e => api._fail && api._fail(e));
+      }
     };
     return api;
   }
 
-  // 若沒有 Apps Script，就掛上一個假的介面，避免整個腳本中斷
-  if(!hasGAS){
+  // 如果在 HtmlService 裡（google.script.run 存在）→ 照舊用內建
+  const hasNative = !!(window.google && google.script && google.script.run);
+
+  // 不在 GAS（例如 GitHub Pages）→ 掛上 fetch 版的 run
+  if(!hasNative){
     window.google = window.google || {};
     google.script = google.script || {};
-    google.script.run = makeDummyRun();
-    // 也避免「載入就自動查詢/載入申請」這類動作做白工：對外暴露一個旗標給後面程式判斷
-    window.__NO_BACKEND__ = true;
-  }else{
-    window.__NO_BACKEND__ = false;
+    google.script.run = makeRun();
+    window.__NO_BACKEND__ = false; // 有後端了，不要走 demo 假資料
   }
 })();
+
 /* ================= 主邏輯（維持你原本的流程） ================= */
 (function(){
 function $(s,el){ return (el||document).querySelector(s); }
