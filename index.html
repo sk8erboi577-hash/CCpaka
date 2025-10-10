@@ -59,7 +59,7 @@ h1{ margin:6px 0 14px; font-size:clamp(18px,2.6vw,22px); }
 input,button,select,textarea{ font:inherit; }
 input[type="text"],input[type="password"],select,textarea{
   flex:1 1 220px;
-  height: clamp(56px, 8vh, 64px);      /* 行動端的實際高度 */
+  height: clamp(56px, 8vh, 64px);          /* 行動端的實際高度 */
   padding:12px 14px;
   border:2px solid var(--border);
   border-radius:14px;
@@ -126,9 +126,9 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
   height:100%; width:100%;
 }
 
-/* 版本徽章（你說要小一點） */
+/* 版本徽章（縮小一級） */
 .version-badge{
-  font-size: clamp(12px, 3.2vw, 14px);   /* 主要調小在這 */
+  font-size: clamp(12px, 3.2vw, 14px);
   margin-left:10px;
   padding:8px 10px;
   border-radius:8px;
@@ -136,9 +136,9 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
   color:var(--muted);
 }
 
-/* 現在時間卡（你說邊框太厚 → 改 1px） */
+/* 現在時間卡（邊框減薄 → 1px） */
 .clock{
-  border:2px solid var(--border);        /* 原 2px → 1px */
+  border:1px solid var(--border);        /* ← 你要的更薄邊框 */
   border-radius:14px;
   padding:8px 12px;
   background:#fff;
@@ -146,7 +146,7 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 }
 
 /* ============================================================================
-  5) 上/下班打卡兩顆大鈕（維持既有大尺寸）
+  5) 上/下班打卡兩顆大鈕
 ============================================================================ */
 #btn-in,#btn-out{
   height: clamp(72px, 14vh, 120px) !important;
@@ -163,20 +163,18 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 /* ============================================================================
   6) 今日摘要 / 今日明細（標題字級統一）
 ============================================================================ */
-/* 統一標題字級：摘要 / 明細 → 同一套尺寸 */
 .card .title strong,
 .details-card .title strong{
   font-size: clamp(20px, 4.6vw, 24px) !important;
   line-height:1.2 !important;
 }
-/* 右上角的小字（例如「只顯示最近 3 筆」） */
 .card .title .muted,
 .details-card .title .muted{
   font-size: clamp(14px, 3.6vw, 16px) !important;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* 今日明細列每一筆的樣式 */
+/* 今日明細每列 */
 #todayList .recentItem{
   display:grid;
   grid-template-columns:auto auto 1fr auto;
@@ -193,7 +191,7 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 .type-pill.in{ background:#dcfce7; color:#166534; }
 .type-pill.out{ background:#dbeafe; color:#1d4ed8; }
 
-/* 顯示更多按鈕（尺寸適中） */
+/* 顯示更多（中型） */
 #btnMore, button#btnMore{
   display:inline-flex; align-items:center; justify-content:center;
   min-height:36px; min-width:100px;
@@ -209,7 +207,7 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 ============================================================================ */
 .bell-btn{
   position: fixed; right: 14px; top: 14px; z-index: 999;
-  width: 36px; height: 40px; border-radius: 50%;
+  width: 48px; height: 48px; border-radius: 50%;
   border: 2px solid var(--border); background:#fff;
   font-size: 26px; display:flex; align-items:center; justify-content:center;
   box-shadow: 0 6px 18px rgba(0,0,0,.12);
@@ -217,7 +215,7 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 .bell-dot{ position:absolute; right:-2px; top:-2px; width:12px; height:12px; background:#ef4444; border:2px solid #fff; border-radius:999px; display:none; }
 .bell-dot.show{ display:block; }
 
-/* 音效鈕放在鈴鐺左邊一點、稍小 */
+/* 音效鈕放在鈴鐺左邊、略小 */
 #btn-sound{
   position: fixed; right: 68px; top: 16px; z-index: 999;
   width: 42px; height: 42px; font-size: 22px;
@@ -239,18 +237,15 @@ button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:
 body.is-freeze{ overflow:hidden; }
 
 /* ============================================================================
-  9) 浮動齒輪（FAB）與工具面板（你要兩欄、與卡片差不多高）
+  9) 浮動齒輪（FAB）與工具面板（兩欄、卡片等級大小）
 ============================================================================ */
-/* 齒輪大小（避免擋畫面） */
 .fab{
   position: fixed; right:16px; bottom:16px; z-index:10002;
-  width:72px; height:72px; font-size:40px;
+  width:72px; height:72px; font-size:40px;   /* ← 齒輪縮回適中 */
   border:none; border-radius:50%;
   background: var(--secondary); color:#fff;
   box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
-
-/* 工具面板：兩欄、按鈕高度接近卡片行距 */
 #tool-panel{
   position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(100%);
   width: 100%; max-width: min(760px, 94vw);
@@ -265,11 +260,9 @@ body.is-freeze{ overflow:hidden; }
 #tool-panel.show{ transform: translateX(-50%) translateY(0); }
 #tool-mask{ position: fixed; inset: 0; background: rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none; }
 #tool-mask.show{ display:block; }
-
-/* 面板內每顆功能鈕 */
 .tool-btn{
-  height: clamp(56px, 9vh, 82px);
-  font-size: clamp(24px, 5vw, 28px);
+  height: clamp(56px, 9vh, 82px);          /* 高度 ≈ 卡片行距 */
+  font-size: clamp(20px, 4.8vw, 24px);
   border-radius: 12px;
   border: 2px solid var(--border);
   display:flex; align-items:center; justify-content:center;
@@ -281,15 +274,49 @@ body.is-freeze{ overflow:hidden; }
 .tool-cal, .tool-refresh, .tool-help { background:#f3f4f6; color:#111; border-color:#d1d5db; }
 
 /* ============================================================================
-  10) Modal（出差 / 補卡 / 請假）主要字級回到一般，不會被大鈕影響
+  10) Modal（出差 / 補卡 / 請假）— 尺寸與欄位
+      目的：避免表單被卡住；面板可滾動；標題固定在頂。
 ============================================================================ */
+#req-modal{ display:none; }
+#req-mask{ position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:10000; }
+/* 面板本體 */
+#req-card{
+  position:fixed; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(560px,92vw);                 /* 面板寬度（手機優先） */
+  max-height:88vh;                       /* 視窗 88% 高 */
+  overflow:auto;                         /* 內容可捲動 */
+  padding:20px;                          /* 內距 */
+  background:#fff; border-radius:16px; border:2px solid var(--border);
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  z-index:10001;
+  box-sizing: border-box;                /* 讓 padding 計入寬高 */
+}
+#req-card .hd{                           /* 標題列固定在頂 */
+  position:sticky; top:0; background:#fff;
+  display:flex; justify-content:space-between; align-items:center;
+  padding-bottom:8px; margin:-4px 0 12px 0; z-index:1;
+  border-bottom:1px solid #e5e7eb;
+}
+#req-title{ margin:0; font-size:18px; font-weight:800; }
+
+/* 彈窗內欄位（回到中型高度，不吃首頁放大規則） */
 #req-card input, #req-card select, #req-card textarea{
-  height: clamp(44px, 6.5vh, 56px); font-size: clamp(16px, 3.8vw, 18px);
+  height: clamp(44px, 6.5vh, 56px);
+  font-size: clamp(16px, 3.8vw, 18px);
   line-height:1.2; padding: 10px 12px; border-radius: 14px;
+  border:2px solid var(--border); background:#fff;
 }
 #req-card input::placeholder, #req-card textarea::placeholder{
   font-size: clamp(14px, 3.6vw, 16px); opacity:.65;
 }
+
+/* 彈窗中的兩欄（補卡日期/時間） */
+#req-card .row.two{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+@media (max-width: 420px){
+  #req-card .row.two{ grid-template-columns: 1fr; }
+}
+
+/* 申請清單（在「我的申請」彈窗裡） */
 .req-list{ display:grid; gap:8px; }
 .req-item{ border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; background:#fff; }
 .req-item h5{ margin:0 0 4px; font-size:14px; }
@@ -335,7 +362,7 @@ body.is-freeze{ overflow:hidden; }
   .fab{ width:64px; height:64px; font-size:34px; right:12px; bottom:12px; }
 }
 
-/* 大螢幕（桌機）面板可以稍微放大但維持兩欄 */
+/* 大螢幕（桌機）面板可稍放大，但維持兩欄 */
 @media (min-width:820px){
   #tool-panel{ max-width: 900px; }
   .tool-btn{ height: 90px; font-size: 26px; }
@@ -343,7 +370,6 @@ body.is-freeze{ overflow:hidden; }
 
 /* Toast 與 FAB 之間的安全距離（有齒輪時） */
 body:has(#fab-tools){ --fab-clearance: 80px; }
-
 </style>
 
 
