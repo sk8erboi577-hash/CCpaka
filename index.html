@@ -1317,12 +1317,12 @@ function showToast(msg, type='ok', subMsg=''){
 
 
 // 版本
-const APP_VERSION = "2025-10-08 若不是最新版本請聯繫管理員";
+const APP_VERSION = "2025-10-10";
 document.addEventListener("DOMContentLoaded", ()=>{ const el = document.getElementById("appVersion"); if(el) el.textContent = `版本${APP_VERSION}`; });
 
 (function resizeReqCard(){
   var card = document.getElementById('req-card'); if(!card) return;
-  card.style.width = 'min(600px, 80vw)'; card.style.maxHeight = '94dvh'; card.style.minHeight = 'min(500px, 74dvh)';
+  card.style.width = 'min(400px, 60vw)'; card.style.maxHeight = '80dvh'; card.style.minHeight = 'min(400px, 60dvh)';
 })();
 
 /* ============ 浮動工具面板：可開可關（再次點齒輪即可收回） ============ */
