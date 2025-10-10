@@ -6,568 +6,237 @@
 <title>打卡系統</title>
 
 <style>
-  :root{
-    --primary:#16a34a; --secondary:#3b82f6; --leave:#9333ea; --trip:#06b6d4; --corr:#f59e0b;
-    --border:#2f3a49; --muted:#6b7280; --chip:#e5e7eb; --card:#ffffff; --bg:#f6f8fb; --maxw:1200px;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:var(--bg);font: clamp(16px,2.4vw,18.5px)/1.65 system-ui,-apple-system,"Noto Sans TC",Segoe UI,Roboto,Arial}
+/* =============== 基本配色/排版 =============== */
+:root{
+  --primary:#16a34a; --secondary:#3b82f6; --leave:#9333ea; --trip:#06b6d4; --corr:#f59e0b;
+  --border:#2f3a49; --muted:#6b7280; --chip:#e5e7eb; --card:#ffffff; --bg:#f6f8fb; --maxw:1200px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);font: clamp(16px,2.4vw,18.5px)/1.65 system-ui,-apple-system,"Noto Sans TC",Segoe UI,Roboto,Arial}
+.wrap{max-width:min(var(--maxw),100vw);margin:0 auto;min-height:100dvh;padding: clamp(8px, 2vw, 14px)}
+.grid{display:grid;gap: clamp(8px, 2vw, 12px)}
+.row{display:flex;gap: clamp(8px, 2vw, 12px);flex-wrap:wrap}
+.row-lg{display:flex;justify-content:space-between;gap: clamp(10px,2.5vw,16px);margin-bottom:6px}
+h1{margin:6px 0 14px;font-size:clamp(18px,2.6vw,22px)}
 
-  .wrap{max-width:min(var(--maxw),100vw);margin:0 auto;min-height:100dvh;padding: clamp(8px, 2vw, 14px)}
-  h1{margin:6px 0 14px;font-size:clamp(18px,2.6vw,22px)}
-  .grid{display:grid;gap: clamp(8px, 2vw, 12px)}
-  .row{display:flex;gap: clamp(8px, 2vw, 12px);flex-wrap:wrap}
-  .row-lg{display:flex;justify-content:space-between;gap: clamp(10px,2.5vw,16px);margin-bottom:6px}
+/* =============== 表單/按鈕/卡片 =============== */
+input,button,select,textarea{font:inherit}
+input[type="text"],input[type="password"],select,textarea{
+  flex:1 1 220px;height: clamp(90px,7.5vh,96px);padding:12px 14px;border:2px solid var(--border);
+  border-radius:20px;background:#fff
+}
+.btn{height: clamp(30px,6.7vh,58px);padding:0 clamp(12px,2vw,18px);border:2px solid var(--border);
+  border-radius:16px;cursor:pointer;background:#fff;font-weight:700;letter-spacing:.02em}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-secondary{background:var(--secondary);border-color:var(--secondary);color:#fff}
+.btn-leave{background:var(--leave);border-color:var(--leave);color:#fff}
+.btn-trip{background:var(--trip);border-color:var(--trip);color:#fff}
+.btn-corr{background:var(--corr);border-color:var(--corr);color:#fff}
+.btn-ghost{background:#fff}
 
-  input,button,select,textarea{font:inherit}
-  input[type="text"],input[type="password"],select,textarea{
-    flex:1 1 220px;height: clamp(90px,7.5vh,96px);padding:12px 14px;border:2px solid var(--border);
-    border-radius:20px;background:#fff
-  }
+.card{background:var(--card);border:2px solid var(--border);border-radius:18px;
+  padding: clamp(12px,1.8vw,18px);height:100%;width:100%}
+.title{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
+.muted{color:var(--muted)}
+.badge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--chip);font-size:.92em}
 
-  .btn{height: clamp(30px,6.7vh,58px);padding:0 clamp(12px,2vw,18px);border:2px solid var(--border);
-    border-radius:16px;cursor:pointer;background:#fff;font-weight:700;letter-spacing:.02em}
-  .btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
-  .btn-secondary{background:var(--secondary);border-color:var(--secondary);color:#fff}
-  .btn-leave{background:var(--leave);border-color:var(--leave);color:#fff}
-  .btn-trip{background:var(--trip);border-color:var(--trip);color:#fff}
-  .btn-corr{background:var(--corr);border-color:var(--corr);color:#fff}
-  .btn-ghost{background:#fff}
+/* 標題（摘要/明細統一） */
+.card .title strong{
+  font-size: clamp(20px, 4.6vw, 24px);
+  line-height:1.2;
+}
+.card .title .muted{
+  font-size: clamp(14px, 3.6vw, 16px);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
 
-  .card{background:var(--card);border:2px solid var(--border);border-radius:18px;padding: clamp(12px,1.8vw,18px);height:100%;width:100%}
-  .title{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px}
-  .muted{color:var(--muted)} .badge{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--chip);font-size:.92em}
-  .clock{
+/* 版本號角標（縮小） */
+.version-badge{
+  font-size: clamp(12px, 3.2vw, 14px);
+  margin-left:10px; padding:8px 10px; border-radius:8px;
+  background:var(--chip); color:var(--muted)
+}
+
+/* 時鐘盒（邊線變薄 + padding縮） */
+.clock{
   border:1px solid var(--border);
   border-radius:14px;
-  padding:8px 12px;          /* 稍微收一點 */
+  padding:8px 12px;
   background:#fff;
   font-weight:800
 }
 
-  /* 主區域單欄 */
-  .main-grid{display:block;width:100%;margin:0;padding:0}
-  .main-grid .grid.h-100{width:100%}
+/* 主區域單欄 */
+.main-grid{display:block;width:100%;margin:0;padding:0}
+.main-grid .grid.h-100{width:100%}
 
-  /* 今日明細列 */
-  #todayList .recentItem{display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;min-height: clamp(42px,6vh,52px);font-size:.95em}
-  .type-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:.92em;font-weight:700;line-height:1;background:#e5e7eb;color:#111827}
-  .type-pill.in{background:#dcfce7;color:#166534} .type-pill.out{background:#dbeafe;color:#1d4ed8}
+/* 今日明細列表 */
+#todayList .recentItem{
+  display:grid;grid-template-columns:auto auto 1fr auto;gap:10px;align-items:center;
+  min-height: clamp(42px,6vh,52px);font-size:.95em
+}
+.type-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:.92em;font-weight:700;line-height:1;background:#e5e7eb;color:#111827}
+.type-pill.in{background:#dcfce7;color:#166534}
+.type-pill.out{background:#dbeafe;color:#1d4ed8}
 
-  /* 巨型上下班鍵 */
-  #btn-in,#btn-out{
-    height:20vh !important;font-size:min(9vw,10vh) !important;font-weight:900;line-height:1.06 !important;
-    border-width:3px;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:0;flex:1;min-width:45%;
-    white-space:nowrap;overflow:hidden;transition-duration:.18s !important;
-  }
-
-  /* 冷凍遮罩 */
-  #freeze-mask{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.75);backdrop-filter:saturate(.6) blur(2px);z-index:9999}
-  #freeze-mask .box{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px 18px;font-weight:900;font-size:48px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
-  body.is-freeze{overflow:hidden}
-  #btn-loc,#locChip{display:none !important}
-
-.version-badge{
-  font-size: clamp(12px, 3.2vw, 14px);
-  margin-left:10px;
-  padding: 6px 10px;         /* 原本 14px 16px */
-  border-radius:8px;
-  background:var(--chip);
-  color:var(--muted)
+/* 巨型上下班鍵（PWA 仍保留大按鈕） */
+#btn-in,#btn-out{
+  height:20vh !important;font-size:min(9vw,10vh) !important;font-weight:900;line-height:1.06 !important;
+  border-width:3px;border-radius:20px;display:flex;align-items:center;justify-content:center;padding:0;flex:1;min-width:45%;
+  white-space:nowrap;overflow:hidden;transition-duration:.18s !important;
 }
 
-  /* 🔔 鈴鐺 */
-  .bell-btn{position: fixed; right: 14px; top: 14px; z-index: 999;
-    width: 66px; height: 66px; border-radius: 80%; border: 2px solid var(--border);
-    background:#fff; cursor:pointer; font-size: 40px; display:flex; align-items:center; justify-content:center;
-    box-shadow: 0 6px 18px rgba(0,0,0,.12)}
-  .bell-btn:active{ transform: translateY(1px); }
-  .bell-dot{position:absolute; right:-2px; top:-2px; width:12px; height:12px;background:#ef4444; border:2px solid #fff; border-radius:999px; display:none}
-  .bell-dot.show{ display:block; }
-/* 🔊 音效開關放在鈴鐺左側一點，尺寸略小 */
-#btn-sound{
-  right: 92px;             /* 鈴鐺預設 right:14px；這顆往左挪一點 */
-  width: 56px; height: 56px; font-size: 32px;
-}
+/* 冷凍遮罩 */
+#freeze-mask{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(255,255,255,.75);backdrop-filter:saturate(.6) blur(2px);z-index:9999}
+#freeze-mask .box{background:#fff;border:2px solid var(--border);border-radius:16px;padding:16px 18px;font-weight:900;font-size:48px;box-shadow:0 10px 30px rgba(0,0,0,.2)}
+body.is-freeze{overflow:hidden}
+#btn-loc,#locChip{display:none !important}
+
+/* 🔔/🔊 漂浮按鈕 */
+.bell-btn{position: fixed; right: 14px; top: 14px; z-index: 999;
+  width: 66px; height: 66px; border-radius: 80%; border: 2px solid var(--border);
+  background:#fff; cursor:pointer; font-size: 40px; display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 6px 18px rgba(0,0,0,.12)}
+.bell-btn:active{ transform: translateY(1px); }
+.bell-dot{position:absolute; right:-2px; top:-2px; width:12px; height:12px;background:#ef4444; border:2px solid #fff; border-radius:999px; display:none}
+.bell-dot.show{ display:block; }
+#btn-sound{ right:92px; width:56px; height:56px; font-size:32px; }
 @media (max-width:480px){
-  #btn-sound{ right: 84px; width: 50px; height: 50px; font-size: 28px; }
+  #btn-sound{ right:84px; width:50px; height:50px; font-size:28px; }
 }
 
-  /* 申請列表 UI */
-  .req-chip{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; margin-left:6px }
-  .req-pending{ background:#e5e7eb; color:#374151 }
-  .req-approved{ background:#dcfce7; color:#166534 }
-  .req-rejected{ background:#fee2e2; color:#b91c1c }
-  .req-list{ display:grid; gap:8px }
-  .req-item{ border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; background:#fff }
-  .req-item h5{ margin:0 0 4px; font-size:14px }
-  .req-item .meta{ color:#6b7280; font-size:12px }
+/* 申請列表 */
+.req-chip{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; margin-left:6px }
+.req-pending{ background:#e5e7eb; color:#374151 }
+.req-approved{ background:#dcfce7; color:#166534 }
+.req-rejected{ background:#fee2e2; color:#b91c1c }
+.req-list{ display:grid; gap:8px }
+.req-item{ border:1px solid #e5e7eb; border-radius:12px; padding:10px 12px; background:#fff }
+.req-item h5{ margin:0 0 4px; font-size:14px }
+.req-item .meta{ color:#6b7280; font-size:12px }
 
-  /* 查詢今日按鈕與輸入框對齊 */
-  #btn-query,#btnQueryToday{
-    height: clamp(90px,9vh,96px) !important;border-radius:14px !important;border:2px solid var(--border);
-    background:#fff;padding:12px 14px;line-height:1;display:flex;align-items:center;justify-content:center;
-    font-weight:800;font-size: clamp(20px, 4.8vw, 26px) !important;
-  }
-  .card .row:first-child{ align-items:stretch; }
-
-  /* Busy */
-  .busy-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:9999}
-  .busy-mask.hidden{display:none}
-  .busy-inner{min-width:220px;max-width:80vw;background:#111;color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;gap:12px;align-items:center}
-  .spinner{width:22px;height:22px;border-radius:50%;border:3px solid #fff;border-top-color:transparent;animation:spin 1s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .busy-inner .msg{font-size:15px;line-height:1.3}
-
-  /* === 浮動工具按鈕 + 展開面板 === */
-  .fab {
-    position: fixed; right: 18px; bottom: 18px; width: 100px; height: 100px;
-    border-radius: 50%; background: var(--secondary); color: #fff; font-size: 66px;
-    border: none; box-shadow: 0 8px 20px rgba(0,0,0,.25); display:flex; align-items:center; justify-content:center;
-    cursor: pointer; z-index: 10002; transition: all .25s ease;
-  }
-  .fab:hover { transform: scale(1.05); background: #2563eb; }
-
-  #tool-panel {
-    position: fixed; left: 50%; bottom: 0; transform: translateX(-50%) translateY(100%);
-    width: 100%; max-width: 1200px; background: #fff; border-radius: 20px 20px 0 0;
-    box-shadow: 0 -10px 30px rgba(0,0,0,.25); transition: transform .3s ease;
-    z-index: 10001; padding: 18px 16px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-  }
-  #tool-panel.show { transform: translateX(-50%) translateY(0); }
-
-  #tool-mask { position: fixed; inset: 0; background: rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none; }
-  #tool-mask.show { display:block; }
-
-  .tool-btn { height: 220px; border-radius: 14px; border: 2px solid var(--border); font-weight: 900; font-size: 75px;
-    display:flex; align-items:center; justify-content:center; gap:6px; color:#fff; }
-  .tool-leave  { background: var(--leave); border-color: var(--leave); }
-  .tool-trip   { background: var(--trip);  border-color: var(--trip); }
-  .tool-corr   { background: var(--corr);  border-color: var(--corr); }
-  .tool-cal, .tool-refresh, .tool-help { background:#f3f4f6; color:#111; }
-  .tool-help{ border-color:#d1d5db }
-
-  @media (max-width:480px){
-    .fab{ width:78px; height:78px; font-size:40px; right:16px; bottom:16px; }
-    #tool-panel{ max-width:96vw; gap:10px; padding:16px 14px 22px; }
-    .tool-btn{ height:64px; font-size:18px; }
-  }
-
-  /* 回退：還原成整頁（root）滾動，恢復 iOS 下拉更新 */
-  .main-grid{ flex: initial !important; display:block !important; }
-  .main-grid .grid.h-100{ display:grid !important; grid-auto-rows:auto; }
-  .card:has(#todayList), .card:has(#sumIn){ display:block !important; }
-  #todayList{ overflow: visible !important; min-height: 0 !important; -webkit-overflow-scrolling:auto !important; }
-  .wrap::after{ content:""; display:block; height:1px; } /* 讓頁高略大於視窗 */
-
-  /* 手機段落整體放大（含「今日有異常」） */
-  @media (max-width:600px){
-    #resp{ font-size: clamp(14px, 4.2vw, 19px) !important; }
-    #resp .badge{
-      font-size: clamp(15px, 4.6vw, 22px) !important;
-      padding: clamp(7px, 2vw, 12px) clamp(12px, 3.2vw, 18px) !important;
-      border-radius: 14px !important; line-height: 1.12 !important;
-      max-width:100% !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
-    }
-    .card .title strong{ font-size: clamp(16px, 4.4vw, 22px) !important; }
-    #sumBadge, .card .title .badge{
-      font-size: clamp(14px, 4.0vw, 20px) !important;
-      padding: clamp(6px, 1.8vw, 10px) clamp(10px, 2.8vw, 16px) !important;
-      border-radius: 12px !important; line-height:1.1 !important;
-      max-width:100% !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
-    }
-    .type-pill{
-      font-size: clamp(15px, 4.2vw, 21px) !important;
-      padding: clamp(7px, 2vw, 12px) clamp(14px, 3.6vw, 20px) !important;
-      border-radius:999px !important; line-height:1.1 !important; max-width:100% !important;
-    }
-    #sumIn, #sumOut, #sumAno{ font-size: clamp(14px, 4.0vw, 20px) !important; }
-    #sumAno{ line-height: 1.35 !important; }
-    .card .title .muted{ font-size: clamp(25px, 3.8vw, 18px) !important; }
-    #todayList .recentItem{
-      gap: clamp(10px, 2.6vw, 16px) !important;
-      min-height: clamp(56px, 8.2vh, 72px) !important;
-      font-size: clamp(25px, 4.0vw, 20px) !important;
-    }
-    #todayList .recentItem .badge{
-      font-size: clamp(13px, 3.8vw, 18px) !important;
-      padding: clamp(5px, 1.6vw, 10px) clamp(10px, 2.8vw, 16px) !important;
-      border-radius:12px !important; line-height:1.1 !important;
-      max-width:100% !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
-    }
-    #todayList .recentItem .muted{ max-width:100% !important; white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important; }
-    #btnMore{
-      font-size: clamp(20px, 4.0vw, 18px) !important;
-      padding: clamp(12px, 2.4vw, 12px) clamp(12px, 3.2vw, 18px) !important;
-      border-radius: 12px !important;
-    }
-  }
-
-  /* 桌面端整體放大（摘要/明細） */
-  #resp{ font-size: 2.5rem !important; }
-  #resp .badge{ font-size: 2.5rem !important; padding:.5em .9em !important; border-radius:.9em !important; line-height:1.12 !important; white-space:nowrap !important; }
-  .card:has(#sumIn) .title strong{ font-size: 2.6rem !important; }
-  .card:has(#sumIn) .title .badge, #sumBadge{ font-size: 2rem !important; padding:.45em .8em !important; border-radius:.8em !important; line-height:1.1 !important; white-space:nowrap !important; }
-  .type-pill{ font-size: 2rem !important; padding:.45em 1.1em !important; border-radius:999px !important; line-height:1.1 !important; }
-  #sumIn, #sumOut, #sumAno{ font-size: 2rem !important; }
-  #todayList .recentItem{ font-size: 2rem !important; gap:.9rem !important; min-height:64px !important; }
-  #todayList .recentItem .badge{ font-size: 2rem !important; padding:.35em .75em !important; border-radius:.75em !important; line-height:1.1 !important; }
-  #todayList .recentItem .muted{ max-width:100% !important; overflow:hidden !important; text-overflow:ellipsis !important; white-space:nowrap !important; }
-
-  /* 今日明細標題 + 右上說明 */
-.details-card .title strong{
-  font-size: clamp(20px, 4.6vw, 24px) !important;
-  line-height:1.2 !important;
+/* ======= 登入列：固定同一排，不換行（UID / PASS / 查詢今日） ======= */
+.card .row:first-child{
+  align-items:stretch;
+  flex-wrap: nowrap !important;   /* 不換行 */
+  overflow: hidden;               /* 保障不擠出第二列 */
 }
-.details-card .title .muted{
-  font-size: clamp(14px, 3.6vw, 16px) !important;
-  white-space:nowrap !important; overflow:hidden !important; text-overflow:ellipsis !important;
+.card .row:first-child > *{ min-width:0; }
+
+/* 欄位比例：兩個輸入各 ~26%，按鈕吃剩餘 */
+#uid, #pass, input#uid, input#pass{
+  flex: 1 1 26% !important;
+  width:auto !important; max-width:none !important;
+  height: clamp(56px, 8vh, 64px) !important;
+  font-size: clamp(18px, 4.4vw, 22px) !important;
+}
+#uid::placeholder, #pass::placeholder{
+  font-size: clamp(18px, 4.4vw, 22px) !important;
+  font-weight:600; letter-spacing:.5px; color:#9ca3af;
 }
 
-  /* 時鐘 */
- font-size: clamp(30px, 4vw, 36px); font-weight:700; line-height:1.6; padding:10px 12px;
-  border:1px solid var(--border);
-  border-radius:10px; background:#fff; text-align:center; min-height:80px;
-  display:flex; align-items:center; justify-content:center;
-}
-
-  /* Login Bar：不換行 + 寬度分配 */
-  .card .row:first-child, .login-row{ display:flex; align-items:stretch; gap:6px; flex-wrap:nowrap !important; }
-  .card .row:first-child > *, .login-row > *{ min-width:0; }
-
-  /* UID/PASSCODE 寬度較短，查詢吃剩餘 */
-  #uid, #pass, input#uid, input#passcode{ flex: 1 1 30% !important; width:auto !important; max-width:none !important; }
-  #btnQueryToday, #btn-query{ flex: 1 1 0% !important; }
-
-  @media (max-width:380px){
-    #uid, #passcode, input#uid, input#passcode{ flex-basis:26% !important; }
-  }
-  @media (min-width:520px){
-    .login-row input[type="text"], .login-row input[type="password"]{ flex-basis:28% !important; }
-    #btnQueryToday, #btn-query{ flex-basis:44% !important; }
-  }
-
-/* 只放大登入列的兩個欄位，不影響彈窗 */
-#uid, #passcode, input#uid, input#pass {
-  font-size: clamp(24px, 5vw, 28px) !important;
-}
-
-#uid::placeholder, #passcode::placeholder,
-.login-row #uid::placeholder, .login-row #passcode::placeholder {
-  font-size: clamp(24px, 5vw, 28px) !important;
-  font-weight:600 !important; letter-spacing:.5px !important; color:#9ca3af !important;
-}
-
-  /* 顯示更多：不溢出、可居中 */
-  #btnMore, button#btnMore{
-    display:inline-flex; align-items:center; justify-content:center;
-    white-space:nowrap; min-height:48px; min-width:140px;
-    font-size: clamp(26px, 5vw, 32px) !important; padding: clamp(18px, 3.5vw, 22px) clamp(28px, 5vw, 36px) !important;
-    border-radius:14px !important; font-weight:800 !important; letter-spacing:.02em !important;
-    background:#fff !important; border:2px solid var(--border) !important; transition: all .2s ease-in-out !important;
-  }
-  #btnMore:hover, #btnMore:active, button#btnMore:hover, button#btnMore:active{
-    transform: scale(1.08); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6;
-  }
-
-  /* 查詢今日 hover/active */
-  #btnQueryToday:hover, #btnQueryToday:active, #btn-query:hover, #btn-query:active{
-    transform: scale(1.08); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6; transition: all .2s ease-in-out;
-  }
-
-  /* 全站按鈕互動動畫（含工具/鈴鐺/上下班/顯示更多/查詢） */
-  button,.btn,.tool-btn,.fab,.bell-btn,#btn-in,#btn-out,#btnMore,button#btnMore,#btnQueryToday,#btn-query,[role="button"],.clickable{
-    -webkit-tap-highlight-color:transparent; will-change:transform;
-    transition:transform .18s ease-in-out, box-shadow .18s ease-in-out, filter .18s ease-in-out, background-color .18s ease-in-out;
-    transform-origin:center; cursor:pointer;
-  }
-  button:hover,.btn:hover,.tool-btn:hover,.fab:hover,.bell-btn:hover,#btn-in:hover,#btn-out:hover,#btnMore:hover,button#btnMore:hover,#btnQueryToday:hover,#btn-query:hover,[role="button"]:hover,.clickable:hover{
-    transform:scale(1.10); box-shadow:0 6px 18px rgba(0,0,0,.18);
-  }
-  button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:active,#btn-out:active,#btnMore:active,button#btnMore:active,#btnQueryToday:active,#btn-query:active,[role="button"]:active,.clickable:active{
-    transform:scale(.94); box-shadow:0 4px 12px rgba(0,0,0,.22); filter:brightness(1.04);
-  }
-  @media (prefers-reduced-motion: reduce){
-    button,.btn,.tool-btn,.fab,.bell-btn,#btn-in,#btn-out,#btnMore,button#btnMore,#btnQueryToday,#btn-query,[role="button"],.clickable{
-      transition:none !important; transform:none !important; box-shadow:none !important;
-    }
-  }
-/* 查詢今日：放大但不撐出邊界 */
-#btnQueryToday, #btn-query {
-  font-size: clamp(22px, 5vw, 32px) !important;  /* 字體放大 */
-  font-weight: 800 !important;
-  line-height: 1.05 !important;
-  padding: 0 10px !important;
-  flex: 1 1 auto !important;
-  max-width: 100% !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: clamp(90px,9vh,96px) !important;
-  border-radius: 14px !important;
-  border: 2px solid var(--border);
-  box-sizing: border-box;
-}
-
-/* 小螢幕時自動略縮字體，避免溢出 */
-@media (max-width:400px) {
-  #btnQueryToday, #btn-query {
-    font-size: clamp(18px, 4vw, 26px) !important;
-  }
-}
-/* ① 修正 id：讓 UID / PASS 在各斷點一起縮，不會撐爆 */
-#uid, #pass,
-input#uid, input#pass{
-  flex: 1 1 30% !important;
-  width: auto !important;
-  max-width: none !important;
-}
-
-@media (max-width:380px){
-  #uid, #pass,
-  input#uid, input#pass{ flex-basis: 26% !important; }
-}
-
-@media (min-width:520px){
-  .login-row input[type="text"],
-  .login-row input[type="password"]{ flex-basis: 28% !important; }
-  #btnQueryToday, #btn-query{ flex-basis: 44% !important; }
-}
-
-/* ② 查詢今日：放大但不溢出；行容器多加一道保險裁切 */
-.card .row:first-child{ overflow: hidden; }  /* 只對登入那一排 */
-
+/* 查詢今日按鈕（與輸入同高、可縮） */
 #btnQueryToday, #btn-query{
-  font-size: clamp(22px, 5vw, 32px) !important;
-  font-weight: 800 !important;
-  line-height: 1.05 !important;
-  padding: 0 10px !important;
-  min-width: 0 !important;
-  flex: 1 1 auto !important;
-  max-width: 100% !important;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  flex: 1 1 38% !important;
+  min-width:0 !important;
+  height: clamp(56px, 8vh, 64px) !important;
+  border-radius:14px !important; border:2px solid var(--border);
+  background:#fff; padding:0 10px !important; line-height:1;
   display:flex; align-items:center; justify-content:center;
-  height: clamp(90px,9vh,96px) !important;
-  border-radius: 14px !important; border: 2px solid var(--border);
+  font-weight:800; font-size: clamp(18px, 4.4vw, 22px) !important;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#btnQueryToday:hover, #btnQueryToday:active, #btn-query:hover, #btn-query:active{
+  transform: scale(1.02); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6; transition:.18s cubic-bezier(.2,.9,.3,1.4);
 }
 
-/* ③ 專為右側那顆調整 hover/active 的放大幅度，避免越界 */
-#btnQueryToday:hover, #btnQueryToday:active,
-#btn-query:hover,     #btn-query:active{
-  transform: scale(1.02);                   /* 由 1.10 改成 1.02 */
-  box-shadow: 0 4px 10px rgba(0,0,0,.15);
-  background: #f3f4f6;
-  transition: all .18s cubic-bezier(.2,.9,.3,1.4);
+/* 顯示更多按鈕（不爆版） */
+#btnMore, button#btnMore{
+  display:inline-flex; align-items:center; justify-content:center; white-space:nowrap;
+  min-height:48px; min-width:140px; font-size: clamp(20px, 4.2vw, 22px);
+  padding: 12px 18px; border-radius:14px; font-weight:800; letter-spacing:.02em;
+  background:#fff; border:2px solid var(--border); transition: all .2s ease-in-out;
 }
-/* === [補丁] 讓彈窗不要被全域放大拖累 === */
+#btnMore:hover, #btnMore:active{ transform: scale(1.05); box-shadow:0 4px 10px rgba(0,0,0,.15); background:#f3f4f6; }
 
-/* 先把所有輸入框/下拉/多行欄位恢復成一般尺寸（含彈窗） */
-input[type="text"],
-input[type="password"],
-select,
-textarea {
-  height: clamp(44px, 6.5vh, 56px) !important;
-  font-size: clamp(16px, 4vw, 18px) !important;
-  padding: 10px 12px !important;
-  line-height: 1.2 !important;
-  border-radius: 14px !important;
-}
+/* Busy 遮罩 */
+.busy-mask{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;z-index:9999}
+.busy-mask.hidden{display:none}
+.busy-inner{min-width:220px;max-width:80vw;background:#111;color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;gap:12px;align-items:center}
+.spinner{width:22px;height:22px;border-radius:50%;border:3px solid #fff;border-top-color:transparent;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.busy-inner .msg{font-size:15px;line-height:1.3}
 
-/* 全站 placeholder 回到一般大小（避免 40px 影響彈窗） */
-input[type="text"]::placeholder,
-input[type="password"]::placeholder,
-textarea::placeholder {
-  font-size: clamp(15px, 3.8vw, 17px) !important;
-  opacity: .65;
-}
+/* 浮動工具面板 */
+.fab{ position: fixed; right: 18px; bottom: 18px; width:100px; height:100px; border-radius:50%;
+  background:var(--secondary); color:#fff; font-size:66px; border:none; box-shadow:0 8px 20px rgba(0,0,0,.25);
+  display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10002; transition:.25s}
+.fab:hover{ transform:scale(1.05); background:#2563eb; }
+#tool-panel{ position:fixed; left:50%; bottom:0; transform:translateX(-50%) translateY(100%); width:100%; max-width:1200px;
+  background:#fff; border-radius:20px 20px 0 0; box-shadow:0 -10px 30px rgba(0,0,0,.25); transition:transform .3s; z-index:10001;
+  padding:18px 16px 24px; display:grid; grid-template-columns:1fr 1fr; gap:20px}
+#tool-panel.show{ transform:translateX(-50%) translateY(0); }
+#tool-mask{ position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter: blur(2px); z-index:10000; display:none }
+#tool-mask.show{ display:block }
+.tool-btn{ height:220px; border-radius:14px; border:2px solid var(--border); font-weight:900; font-size:75px;
+  display:flex; align-items:center; justify-content:center; gap:6px; color:#fff }
+.tool-leave{ background:var(--leave); border-color:var(--leave) }
+.tool-trip{ background:var(--trip); border-color:var(--trip) }
+.tool-corr{ background:var(--corr); border-color:var(--corr) }
+.tool-cal,.tool-refresh,.tool-help{ background:#f3f4f6; color:#111 }
+.tool-help{ border-color:#d1d5db }
 
-/* ====== 只有登入列維持放大（你原本要放大的地方） ====== */
-#uid, #pass, #passcode,
-input#uid, input#pass, input#passcode {
-  height: clamp(90px, 9vh, 96px) !important;
-  font-size: clamp(40px, 6vw, 42px) !important;
-}
+/* ======= 內容滾動修正 ======= */
+.main-grid{ flex: initial !important; display:block !important }
+.main-grid .grid.h-100{ display:grid !important; grid-auto-rows:auto }
+.card:has(#todayList), .card:has(#sumIn){ display:block !important }
+#todayList{ overflow: visible !important; min-height:0 !important; -webkit-overflow-scrolling:auto !important }
+.wrap::after{ content:""; display:block; height:1px }
 
-/* 登入列的 placeholder 也放大，但只限這兩格 */
-#uid::placeholder,
-#pass::placeholder,
-#passcode::placeholder,
-.login-row #uid::placeholder,
-.login-row #pass::placeholder,
-.login-row #passcode::placeholder {
-  font-size: clamp(40px, 6vw, 42px) !important;
-  font-weight: 600 !important;
-  letter-spacing: .5px !important;
-  color: #9ca3af !important;
-}
+/* ======= Toast ======= */
+.toast-stack{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom)); transform:translateX(-50%);
+  z-index:11000; display:grid; gap:12px; pointer-events:none; width:100%; max-width:min(90vw,720px) }
+.toast{ width:100%; color:#fff; background:#16a34a; padding: clamp(14px, 3.4vw, 22px) clamp(18px, 4.0vw, 28px);
+  border-radius:16px; font-weight:900; font-size: clamp(28px, 6vw, 32px); line-height:1.25; text-align:center;
+  box-shadow:0 14px 34px rgba(0,0,0,.28); opacity:0; transform:translate(-50%,12px) scale(.98);
+  transition: opacity .28s ease, transform .28s ease; will-change:opacity, transform; position:relative; left:50% }
+.toast.show{ opacity:1; transform:translate(-50%,0) scale(1) }
+.toast.warn{ background:#f59e0b } .toast.err{ background:#b91c1c }
+.toast .sub{ display:block; font-weight:700; opacity:.95; margin-top:.25em; font-size:.9em }
+@media (max-width:520px){ .toast{ border-radius:14px } }
+body:has(#fab-tools){ --fab-clearance:96px } .toast-stack{ margin-bottom:var(--fab-clearance,0) }
 
-/* （可選）彈窗裡的送出按鈕不要太巨大 */
-[role="dialog"] button,
-.modal button,
-.popup button {
-  height: clamp(42px, 6vh, 52px) !important;
-  font-size: clamp(16px, 4vw, 18px) !important;
-  border-radius: 12px !important;
-}
-/* === Modal 專用：只縮小彈窗內欄位與 placeholder，大廳不受影響 === */
-#req-card input,
-#req-card select, #req-card textarea {
-  height: clamp(44px, 6.5vh, 56px) !important;
-  font-size: clamp(16px, 3.8vw, 18px) !important;
-  line-height: 1.2 !important;
-  padding: 10px 12px !important;
-  border-radius: 14px !important;
-}
-
-#req-card input::placeholder,
-#req-card textarea::placeholder {
-  font-size: clamp(14px, 3.6vw, 16px) !important;
-  opacity: .65 !important;
+/* ======= RWD 微調 ======= */
+@media (max-width:820px){
+  /* 上下班鍵略降尺寸更像 App */
+  #btn-in,#btn-out{ height: clamp(72px, 14vh, 120px) !important; font-size: clamp(40px, 7vw, 48px) !important; border-radius:14px !important }
+  /* 時鐘更精緻 */
+  #clock{ font-size: clamp(18px, 4.6vw, 24px) !important; padding:10px 12px !important }
+  /* 鈴鐺/喇叭縮一格，避免壓到圓角 */
+  .bell-btn{ right: 8px; top: 8px; width: 44px; height: 44px; font-size: 22px }
+  #btn-sound{ right:56px; width:40px; height:40px; font-size:20px }
+  /* 卡片圓角收斂 */
+  .card{ border-radius:14px !important }
 }
 
-/* 有些「例如」不是 placeholder，而是輔助字樣（badge/muted）—一起降級 */
-#req-card .hint,
-#req-card .example,
-#req-card .placeholder,
-#req-card .badge,
-#req-card .muted {
-  font-size: clamp(14px, 3.6vw, 16px) !important;
+/* ======= 互動動畫（全站） ======= */
+button,.btn,.tool-btn,.fab,.bell-btn,#btn-in,#btn-out,#btnMore,#btnQueryToday,#btn-query,[role="button"],.clickable{
+  -webkit-tap-highlight-color:transparent; will-change:transform;
+  transition:transform .18s ease-in-out, box-shadow .18s ease-in-out, filter .18s ease-in-out, background-color .18s ease-in-out;
+  transform-origin:center; cursor:pointer;
 }
-/* === Pulse 動畫（打卡按鈕） === */
-@keyframes pulse {
-  0%   { transform: scale(1);   box-shadow: 0 0 0 rgba(0,0,0,0); }
-  40%  { transform: scale(1.12); box-shadow: 0 10px 24px rgba(0,0,0,.18); }
-  100% { transform: scale(1);   box-shadow: 0 0 0 rgba(0,0,0,0); }
+button:hover,.btn:hover,.tool-btn:hover,.fab:hover,.bell-btn:hover,#btn-in:hover,#btn-out:hover,#btnMore:hover,#btnQueryToday:hover,#btn-query:hover,[role="button"]:hover,.clickable:hover{
+  transform:scale(1.06); box-shadow:0 6px 18px rgba(0,0,0,.18)
 }
-.btn-pulse { animation: pulse .26s ease; }
-
-/* === Toast（置中、正下方、放大、避開齒輪） === */
-.toast-stack{
-  position: fixed;
-  left: 50%;
-  bottom: calc(24px + env(safe-area-inset-bottom)); /* 安全區 + 基本間距 */
-  transform: translateX(-50%);
-  z-index: 11000;                 /* 高於齒輪與面板 */
-  display: grid;
-  gap: 12px;
-  pointer-events: none;           /* 點擊穿透 */
-  width: 100%;
-  max-width: min(90vw, 720px);    /* 在手機也夠大 */
+button:active,.btn:active,.tool-btn:active,.fab:active,.bell-btn:active,#btn-in:active,#btn-out:active,#btnMore:active,#btnQueryToday:active,#btn-query:active,[role="button"]:active,.clickable:active{
+  transform:scale(.96); box-shadow:0 4px 12px rgba(0,0,0,.22); filter:brightness(1.04)
 }
-
-.toast{
-  width: 100%;
-  color: #fff;
-  background: #16a34a;           /* ok 預設綠 */
-  padding: clamp(14px, 3.4vw, 22px) clamp(18px, 4.0vw, 28px);
-  border-radius: 16px;
-  font-weight: 900;
-  font-size: clamp(36px, 6vw, 40px);  /* 放大字體 */
-  line-height: 1.25;
-  text-align: center;             /* 置中文字，訊息更明顯 */
-  box-shadow: 0 14px 34px rgba(0,0,0,.28);
-
-  opacity: 0;
-  transform: translate(-50%, 12px) scale(.98);
-  transition: opacity .28s ease, transform .28s ease;
-  will-change: opacity, transform;
-  position: relative;
-  left: 50%;
-}
-
-.toast.show{
-  opacity: 1;
-  transform: translate(-50%, 0) scale(1);
-}
-
-.toast.warn{ background:#f59e0b; }  /* 站外 */
-.toast.err { background:#b91c1c; }  /* 失敗 */
-
-.toast .sub{
-  display:block;
-  font-weight:700;
-  opacity:.95;
-  margin-top: .25em;
-  font-size: .9em;
-}
-
-/* 小螢幕也保持大、但不爆版 */
-@media (max-width: 520px){
-  .toast{
-    border-radius: 14px;
-  }
-}
-
-/* 若右下角有齒輪（fab），再多墊高一點避免重疊 */
-body:has(#fab-tools){
-  --fab-clearance: 96px; /* 齒輪直徑 + 內距 */
-}
-.toast-stack{
-  margin-bottom: var(--fab-clearance, 0);
-}
-/* ===== 行動版快速修正：還原字級、縮小鈴鐺，避免爆版 ===== */
-@media (max-width: 820px){
-  #resp,
-  #resp .badge,
-  .card:has(#sumIn) .title strong,
-  .card:has(#sumIn) .title .badge,
-  #sumBadge,
-  .type-pill,
-  #sumIn,#sumOut,#sumAno,
-  #todayList .recentItem,
-  #todayList .recentItem .badge{
-    font-size: clamp(14px, 3.8vw, 18px) !important;
-  }
-  .bell-btn{ right: 12px; top: 12px; width: 48px; height: 48px; font-size: 26px; }
-  #btn-sound{ right: 64px; width: 44px; height: 44px; font-size: 22px; }
-}
-  /* === Mobile polish overrides：手機尺寸整體縮小、間距更緊湊 === */
-@media (max-width: 820px){
-  /* 巨型上下班鍵 → 降到 14vh，字體更合適 */
-  #btn-in, #btn-out{
-    height: clamp(72px, 14vh, 120px) !important;
-    font-size: clamp(40px, 7vw, 48px) !important;
-    border-radius: 14px !important;
-  }
-
-  /* 時鐘不要那麼醒目，留白少一點 */
-  #clock{
-    font-size: clamp(18px, 4.6vw, 24px) !important;
-    padding: 10px 12px !important;
-  }
-
-  /* 登入列（UID/PASS/查詢）高度與字級回到正常 */
-  #uid, #pass, input#uid, input#pass{
-    height: clamp(56px, 8vh, 64px) !important;
-    font-size: clamp(18px, 4.4vw, 22px) !important;
-  }
-  #uid::placeholder, #pass::placeholder{
-    font-size: clamp(18px, 4.4vw, 22px) !important;
-  }
-  #btn-query{
-    height: clamp(56px, 8vh, 64px) !important;
-    font-size: clamp(18px, 4.4vw, 22px) !important;
-  }
-
-  /* 摘要/明細：徽章、pill、行高別太大 */
-  #resp{ font-size: clamp(16px, 4vw, 18px) !important; }
-  #resp .badge{ font-size: inherit !important; padding: .35em .65em !important; }
-  .type-pill{ font-size: clamp(14px, 3.8vw, 16px) !important; padding: .4em .8em !important; }
-  #todayList .recentItem{ min-height: clamp(20px, 4.8vh, 24px) !important; }
-
-  /* 鈴鐺/喇叭再縮一格，避免壓到卡片圓角 */
-  .bell-btn{ right: 8px; top: 8px; width: 44px; height: 44px; font-size: 22px; }
-  #btn-sound{ right: 56px; width: 40px; height: 40px; font-size: 20px; }
-
-  /* 卡片圓角與邊線也略收斂（更像原生 App） */
-  .card{ border-radius: 14px !important; }
-}
+@keyframes pulse{ 0%{transform:scale(1);box-shadow:0 0 0 rgba(0,0,0,0)} 40%{transform:scale(1.12);box-shadow:0 10px 24px rgba(0,0,0,.18)} 100%{transform:scale(1);box-shadow:0 0 0 rgba(0,0,0,0)} }
+.btn-pulse{ animation:pulse .26s ease }
 
 </style>
+
 <!-- === PWA 設定 === -->
 <!-- ✅ 改成相對路徑，千萬不要用 /manifest.webmanifest -->
 <link rel="manifest" href="./manifest.webmanifest">
