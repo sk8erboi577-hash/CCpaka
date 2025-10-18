@@ -360,6 +360,36 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 .busy-inner .msg {
   display: none;                   /* 不要顯示「處理中…」這幾個字 */
 }
+  /* === 節日淡入圖片動畫 === */
+.festival-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0);
+  opacity: 0;
+  transition: opacity 1.2s ease, background 1.2s ease;
+  z-index: 9999;
+  pointer-events: all;
+}
+
+.festival-overlay.show {
+  opacity: 1;
+  background: rgba(255,255,255,0.85); /* 可改透明度 */
+}
+
+.festival-img {
+  max-width: 60vw;
+  max-height: 60vh;
+  animation: festival-pop 1s ease forwards;
+}
+
+@keyframes festival-pop {
+  from { transform: scale(0.8); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
 </style>
 
 
@@ -1316,6 +1346,42 @@ if ('serviceWorker' in navigator) {
     .then(()=>console.log('SW registered'))
     .catch(e=>console.warn('SW failed', e));
 }
+
+document.addEventListener('DOMContentLoaded', async ()=>{
+  // 節日主題判斷（可從後端或自己定義）
+  const today = new Date();
+  const m = today.getMonth()+1;
+  const d = today.getDate();
+  let theme = '';
+
+  // 🌕 這裡自行定義要顯示的節日圖（可以連結後端改寫）
+  if (m===9 && d>=14 && d<=18) theme = 'mid_autumn';        // 中秋
+  else if (m===6 && d>=8 && d<=12) theme = 'dragon_boat';   // 端午
+  else if (m===1 && d<=5) theme = 'spring_festival';         // 過年
+  // else if (...) theme = 'christmas' // 可再加
+
+  if (!theme) return; // 無節日不顯示
+
+  // 圖片路徑（依你自己的資料夾結構調整）
+  const imgSrc = `./img/festival/${theme}.png`;
+
+  // 建立覆蓋層
+  const overlay = document.createElement('div');
+  overlay.className = 'festival-overlay';
+  overlay.innerHTML = `<img src="${imgSrc}" alt="${theme}" class="festival-img">`;
+  document.body.appendChild(overlay);
+
+  // 淡入顯示
+  requestAnimationFrame(()=> overlay.classList.add('show'));
+
+  // 自動淡出 (3 秒後)
+  setTimeout(()=> overlay.classList.remove('show'), 3000);
+  // 5 秒後移除 DOM
+  setTimeout(()=> overlay.remove(), 5000);
+
+  // 點一下也可關閉
+  overlay.addEventListener('click', ()=> overlay.remove());
+});
 </script>
 </body>
 </html>
