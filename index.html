@@ -1355,7 +1355,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   let theme = '';
 
   // 🌕 這裡自行定義要顯示的節日圖（可以連結後端改寫）
-let theme = 'mid_autumn'; // << 手動指定測試用
+if (m===10 && d>=18 && d<=20) theme = 'mid_autumn';        // 中秋
+else if (m===6 && d>=8 && d<=12) theme = 'dragon_boat';   // 端午
+else if (m===1 && d<=5) theme = 'spring_festival';         // 過年
   // else if (...) theme = 'christmas' // 可再加
 
   if (!theme) return; // 無節日不顯示
