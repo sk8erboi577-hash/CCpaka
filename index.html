@@ -376,13 +376,26 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 
 .festival-overlay.show {
   opacity: 1;
-  background: rgba(255,255,255,0.85); /* 可改透明度 */
+  background: rgba(255,255,255,0.85);
 }
 
+/* 🎨 節日圖片調整為「手機全螢幕感」 */
 .festival-img {
-  max-width: 60vw;
-  max-height: 60vh;
+  width: 85vw;         /* 寬度佔視窗的 85% */
+  max-width: 600px;    /* 在平板不會過大 */
+  height: auto;
+  object-fit: contain;
+  border-radius: 18px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.25);
   animation: festival-pop 1s ease forwards;
+}
+
+/* 小螢幕（像 iPhone SE）再微調 */
+@media (max-width: 380px) {
+  .festival-img {
+    width: 90vw;
+    max-width: 340px;
+  }
 }
 
 @keyframes festival-pop {
