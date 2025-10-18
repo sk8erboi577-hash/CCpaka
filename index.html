@@ -1368,16 +1368,16 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   let theme = '';
 
   // 🌕 這裡自行定義要顯示的節日圖（可以連結後端改寫）
-  if (m===1 && d===1) theme = 'new_year';                      // 元旦
-  else if (m===2 && d>=13 && d<=20) theme = 'spring_festival';  // 春節/除夕（大致範圍）
-  else if (m===2 && d>=15 && d<=18) theme = 'lantern_festival';// 元宵節
-  else if (m===4 && (d===4 || d===5)) theme = 'tomb_sweeping'; // 清明節
-  else if (m===5 && (d===10 || d===11)) theme = 'Mothers_Day'; // 母親節 
-  else if (m===6 && d>=19 && d<=20) theme = 'dragon_boat';     // 端午節
-  else if (m===9 && d>=14 && d<=22) theme = 'mid_autumn';      // 中秋節
-  else if (m===10 && d===10) theme = 'national_day';           // 雙十節
-  else if (m===10 && d===31) theme = 'Halloween_day';          // 萬聖節
-  else if (m===12 && d===25) theme = 'christmas';              // 聖誕節
+  if (m===1 && d>=1 && d<=3) theme = 'new_year';                 // 元旦
+  else if (m===2 && d>=13 && d<=20) theme = 'spring_festival';   // 春節/除夕（大致範圍）
+  else if (m===2 && d>=15 && d<=18) theme = 'lantern_festival';  // 元宵節
+  else if (m===4 && (d===4 || d===5)) theme = 'tomb_sweeping';   // 清明節
+  else if (m===5 && (d===10 || d===11)) theme = 'Mothers_Day';   // 母親節 
+  else if (m===6 && d>=19 && d<=20) theme = 'dragon_boat';       // 端午節
+  else if (m===9 && d>=25 && d<=28) theme = 'mid_autumn';        // 中秋節
+  else if (m===10 && d>=10 && d<=12) theme = 'national_day';     // 雙十節
+  else if (m===10 && d===31) theme = 'Halloween_day';            // 萬聖節
+  else if (m===12 && d>=25 && d<=27) theme = 'christmas';                // 聖誕節
   // else if (...) theme = 'christmas' // 可再加
 
   if (!theme) return; // 無節日不顯示
