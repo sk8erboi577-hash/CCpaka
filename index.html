@@ -429,7 +429,7 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
       // 指定 service worker (GH Pages 必須放在網站根目錄)
       serviceWorkerPath: "OneSignalSDKWorker.js",
       serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
-      serviceWorkerParam: { scope: "/" }
+     serviceWorkerParam: { scope: "/CCpaka/" }   // ← 加這個讓它作用在 /CCpaka/
     });
 
     // （可選）如果你有自己的 UID，登入之後你就能精準推播給該人
