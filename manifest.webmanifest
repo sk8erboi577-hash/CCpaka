@@ -2,8 +2,8 @@
   "name": "打卡系統",
   "short_name": "打卡",
   "id": "./?pwa=1",
-  "start_url": "./?pwa=1",
-  "scope": "./",
+  "start_url": "./index.html",              // ✅ 改成明確檔名
+  "scope": "./",                            // ✅ 維持相對路徑
   "display": "standalone",
   "background_color": "#f6f8fb",
   "theme_color": "#16a34a",
