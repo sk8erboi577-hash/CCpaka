@@ -417,6 +417,19 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
+<!-- OneSignal SDK -->
+<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<script>
+  window.OneSignal = window.OneSignal || [];
+  OneSignal.push(function() {
+    OneSignal.init({
+      appId: "494eeaff-4374-4470-9943-5a1b85c8d9a1",
+      safari_web_id: "",
+      notifyButton: { enable: true },
+    });
+  });
+</script>
+
 
 </head>
 <body>
