@@ -417,23 +417,6 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  window.OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "95a059c8-d7db-4179-8c61-16950859e2a8",
-      notifyButton: { enable: true },
-
-      // ⬇⬇⬇ 關鍵：用「絕對路徑」指到 /CCpaka/
-      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
-      serviceWorkerUpdaterPath: "/CCpaka/OneSignalSDKUpdaterWorker.js",
-      serviceWorkerParam: { scope: "/CCpaka/" }
-    });
-    console.log("OneSignal initialized ✅");
-  });
-</script>
-
 
 </head>
 <body>
