@@ -432,12 +432,13 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
       appId: '49eaeaff-4374-4470-9943-5a1b85c8d9a1',
       notifyButton: { enable: true },
     });
-
-    // iOS 需要明確提示授權
+  // 延遲 1 秒再檢查
+  setTimeout(() => {
     OneSignal.isPushNotificationsEnabled(function(enabled) {
       if (!enabled) OneSignal.Slidedown.promptPush();
     });
-  });
+  }, 1000);
+});
 </script>
 
   <script>
