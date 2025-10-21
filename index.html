@@ -417,26 +417,23 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
-<!-- OneSignal SDK（放在 <head>，使用 v16） -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-
 <script>
-  // 初始化（可放在 <head> 末端或 </body> 前）
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   window.OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: "95a059c8-d7db-4179-8c61-16950859e2a8",
-      // 指定 service worker (GH Pages 必須放在網站根目錄)
-      serviceWorkerPath: "OneSignalSDKWorker.js",
-      serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
-     serviceWorkerParam: { scope: "/CCpaka/" }   // ← 加這個讓它作用在 /CCpaka/
-    });
+      notifyButton: { enable: true },
 
-    // （可選）如果你有自己的 UID，登入之後你就能精準推播給該人
-    // 例如：await OneSignal.login("員工的UID");
-    // （可選）打標籤：await OneSignal.User.addTag("role","staff");
+      // ⬇⬇⬇ 關鍵：用「絕對路徑」指到 /CCpaka/
+      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
+      serviceWorkerUpdaterPath: "/CCpaka/OneSignalSDKUpdaterWorker.js",
+      serviceWorkerParam: { scope: "/CCpaka/" }
+    });
+    console.log("OneSignal initialized ✅");
   });
 </script>
+
 
 </head>
 <body>
