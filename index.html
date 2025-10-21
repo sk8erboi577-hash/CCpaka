@@ -417,88 +417,24 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
-<!-- OneSignal SDK -->
-<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<!-- OneSignal SDK（放在 <head>，使用 v16） -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
 <script>
-  // ====== 路徑（子資料夾 /CCpaka/ 用相對路徑）======
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.SERVICE_WORKER_PARAM = { scope: './' };
-  OneSignal.SERVICE_WORKER_PATH = 'OneSignalSDKWorker.js';
-  OneSignal.SERVICE_WORKER_UPDATER_PATH = 'OneSignalSDKUpdaterWorker.js';
-
-  // ====== 初始化 ======
-  OneSignal.push(function () {
-    OneSignal.init({
-      appId: '49eaeaff-4374-4470-9943-5a1b85c8d9a1',
-      notifyButton: { enable: false } // 我們改用手動鈴鐺
+  // 初始化（可放在 <head> 末端或 </body> 前）
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  window.OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "95a059c8-d7db-4179-8c61-16950859e2a8",
+      // 指定 service worker (GH Pages 必須放在網站根目錄)
+      serviceWorkerPath: "OneSignalSDKWorker.js",
+      serviceWorkerUpdaterPath: "OneSignalSDKUpdaterWorker.js",
+      serviceWorkerParam: { scope: "/" }
     });
 
-    // --- 小延遲，等 iOS PWA 可用 Notification API ---
-    setTimeout(refreshPushState, 800);
-
-    // 如果你的頁面有鈴鐺按鈕（看到你右上角有），請確保它的 id 是 btn-bell
-    document.addEventListener('click', function(e){
-      if (e.target.closest('#btn-bell')) requestPushPermission();
-    });
-  });
-
-  // ====== 手動觸發授權（一定要在使用者點擊時呼叫）======
-  async function requestPushPermission(){
-    try {
-      // 先嘗試 OneSignal 的彈窗
-      if (OneSignal.Slidedown) {
-        await OneSignal.Slidedown.promptPush();
-      }
-      // 再保險呼叫一次註冊（iOS 需要手勢觸發）
-      if (OneSignal.registerForPushNotifications) {
-        await OneSignal.registerForPushNotifications();
-      }
-    } catch(e) {
-      console.error('requestPushPermission error:', e);
-    } finally {
-      setTimeout(refreshPushState, 800);
-    }
-  }
-
-  // ====== 顯示目前狀態（你右下角的小框）======
-  async function refreshPushState(){
-    const boxId = 'push-debug-box';
-    let box = document.getElementById(boxId);
-    if (!box){
-      box = document.createElement('div');
-      box.id = boxId;
-      box.style.cssText='position:fixed;right:12px;bottom:12px;padding:8px 10px;border:1px solid #ccc;background:#fff;border-radius:10px;font:14px system-ui;z-index:99999';
-      box.innerHTML = `
-        <div><b>Push 狀態</b>：<span id="pushStateTxt">檢查中…</span></div>
-        <div style="margin-top:6px;display:flex;gap:8px">
-          <button id="dbgSub">訂閱</button>
-          <button id="dbgUnsub">取消訂閱</button>
-        </div>`;
-      document.body.appendChild(box);
-      document.getElementById('dbgSub').onclick = requestPushPermission;
-      document.getElementById('dbgUnsub').onclick = async () => { try{
-        await OneSignal.setSubscription(false);
-      } finally { setTimeout(refreshPushState, 500); } };
-    }
-
-    const txt = document.getElementById('pushStateTxt');
-    try {
-      const enabled = await OneSignal.isPushNotificationsEnabled();
-      const permission = (window.Notification && Notification.permission) || 'unknown';
-      const id = await OneSignal.getUserId();
-      txt.textContent = `${enabled ? '已訂閱' : '未訂閱'} / 權限:${permission}${id ? ' / ID:'+id.slice(0,8)+'…' : ''}`;
-    } catch (e) {
-      console.error('refreshPushState error:', e);
-      txt.textContent = '讀取狀態失敗（點右上鈴鐺授權）';
-    }
-  }
-
-  // （可選）偵測變化自動更新
-  OneSignal.push(function(){
-    OneSignal.on('subscriptionChange', refreshPushState);
-    if (OneSignal.on && OneSignal.on['notificationPermissionChange']) {
-      OneSignal.on('notificationPermissionChange', refreshPushState);
-    }
+    // （可選）如果你有自己的 UID，登入之後你就能精準推播給該人
+    // 例如：await OneSignal.login("員工的UID");
+    // （可選）打標籤：await OneSignal.User.addTag("role","staff");
   });
 </script>
 
