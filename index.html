@@ -417,18 +417,25 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
+<!-- OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
   window.OneSignal = window.OneSignal || [];
-  // 這三行是關鍵：告訴 OneSignal 你的網站在 /CCpaka/ 底下
-  OneSignal.SERVICE_WORKER_PARAM = { scope: '/CCpaka/' };
-  OneSignal.SERVICE_WORKER_PATH = '/CCpaka/OneSignalSDKWorker.js';
-  OneSignal.SERVICE_WORKER_UPDATER_PATH = '/CCpaka/OneSignalSDKUpdaterWorker.js';
 
-  OneSignal.push(function () {
+  // 正確設定：因為網站部署在 /CCpaka/ 子目錄，所以這裡不用加斜線開頭
+  OneSignal.SERVICE_WORKER_PARAM = { scope: './' };
+  OneSignal.SERVICE_WORKER_PATH = 'OneSignalSDKWorker.js';
+  OneSignal.SERVICE_WORKER_UPDATER_PATH = 'OneSignalSDKUpdaterWorker.js';
+
+  OneSignal.push(function() {
     OneSignal.init({
-      appId: '494eeaff-4374-4470-9943-5a1b85c8d9a1',
-      notifyButton: { enable: true }
+      appId: '49eaeaff-4374-4470-9943-5a1b85c8d9a1',
+      notifyButton: { enable: true },
+    });
+
+    // iOS 需要明確提示授權
+    OneSignal.isPushNotificationsEnabled(function(enabled) {
+      if (!enabled) OneSignal.Slidedown.promptPush();
     });
   });
 </script>
