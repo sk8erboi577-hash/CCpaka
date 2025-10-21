@@ -439,17 +439,6 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
     });
   });
 </script>
-<script>
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function () {
-    OneSignal.isPushNotificationsEnabled(function (enabled) {
-      if (!enabled) {
-        // 叫出訂閱彈窗（iOS 需在 PWA 內手動允許）
-        OneSignal.Slidedown.promptPush();
-      }
-    });
-  });
-</script>
 
 </head>
 <body>
