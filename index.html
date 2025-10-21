@@ -417,15 +417,18 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="apple-touch-icon" href="./icon-192.png">
 
-<!-- OneSignal SDK -->
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
   window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
+  // 這三行是關鍵：告訴 OneSignal 你的網站在 /CCpaka/ 底下
+  OneSignal.SERVICE_WORKER_PARAM = { scope: '/CCpaka/' };
+  OneSignal.SERVICE_WORKER_PATH = '/CCpaka/OneSignalSDKWorker.js';
+  OneSignal.SERVICE_WORKER_UPDATER_PATH = '/CCpaka/OneSignalSDKUpdaterWorker.js';
+
+  OneSignal.push(function () {
     OneSignal.init({
-      appId: "494eeaff-4374-4470-9943-5a1b85c8d9a1",
-      safari_web_id: "",
-      notifyButton: { enable: true },
+      appId: '494eeaff-4374-4470-9943-5a1b85c8d9a1',
+      notifyButton: { enable: true }
     });
   });
 </script>
