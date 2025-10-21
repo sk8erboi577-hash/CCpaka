@@ -1403,34 +1403,6 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   //overlay.addEventListener('click', ()=> overlay.remove());
 });
 
-  <!-- 🔽 放在你的 <body> 最後（結束前一行即可） -->
-
-  // === OneSignal 測試版初始化 ===
-  (function(){
-    // 🪪 你從 OneSignal 後台拿到的 App ID
-    const APP_ID = "1a5b28a4-1325-4876-af3c-ec07825d2a7d";
-
-    // 建立 OneSignal SDK script 標籤
-    const s = document.createElement("script");
-    s.src = "https://cdn.onesignal.com/sdks/OneSignalSDK.js";
-    s.async = true;
-    s.onload = () => {
-      console.log("✅ OneSignal SDK loaded");
-
-      // 初始化設定
-      window.OneSignalDeferred = window.OneSignalDeferred || [];
-      OneSignalDeferred.push(function(OneSignal) {
-        OneSignal.init({
-          appId: APP_ID,
-          notifyButton: { enable: true }, // 右下角出現通知開關鈕
-          allowLocalhostAsSecureOrigin: true // 方便測試
-        });
-        console.log("✅ OneSignal init 完成");
-      });
-    };
-    document.head.appendChild(s);
-  })();
 </script>
-
 </body>
 </html>
