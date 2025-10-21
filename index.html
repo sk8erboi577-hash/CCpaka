@@ -1376,8 +1376,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   else if (m===8 && (d===8 || d===11)) theme = 'Fathers_Day';    // 父親節 
   else if (m===9 && d>=25 && d<=28) theme = 'mid_autumn';        // 中秋節
   else if (m===10 && d>=10 && d<=12) theme = 'national_day';     // 雙十節
-  else if (m===10 && d===21) theme = 'Halloween_day';            // 萬聖節
-  else if (m===12 && d>=25 && d<=27) theme = 'christmas';                // 聖誕節
+  else if (m===10 && d>=29 && d<=31) theme = 'Halloween_day';            // 萬聖節
+  else if (m===12 && d>=24 && d<=27) theme = 'christmas';                // 聖誕節
   // else if (...) theme = 'christmas' // 可再加
 
   if (!theme) return; // 無節日不顯示
