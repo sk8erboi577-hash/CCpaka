@@ -440,6 +440,47 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
   });
 </script>
 
+  <script>
+  OneSignal.push(function () {
+    // 建一個小狀態框
+    const box = document.createElement('div');
+    box.style.cssText = 'position:fixed;right:10px;bottom:10px;padding:8px 10px;border:1px solid #ccc;background:#fff;border-radius:8px;font:14px/1.4 system-ui;z-index:99999';
+    box.innerHTML = `
+      <div><b>Push 狀態</b>: <span id="pushState">檢查中…</span></div>
+      <div style="margin-top:6px">
+        <button id="btnSub">訂閱</button>
+        <button id="btnUnsub">取消訂閱</button>
+      </div>`;
+    document.body.appendChild(box);
+
+    const stateEl = document.getElementById('pushState');
+    async function refreshState() {
+      try {
+        const enabled = await OneSignal.isPushNotificationsEnabled();
+        const permission = Notification.permission; // 'default' | 'granted' | 'denied'
+        const id = await OneSignal.getUserId(); // Player ID
+        stateEl.textContent = `${enabled ? '已訂閱' : '未訂閱'} / 權限:${permission}${id ? ' / ID:'+id.slice(0,8)+'…' : ''}`;
+      } catch (e) {
+        stateEl.textContent = '讀取狀態失敗';
+      }
+    }
+    document.getElementById('btnSub').onclick = async () => {
+      try {
+        // 叫出 OneSignal 的授權面板；必要時直接註冊
+        if (OneSignal.Slidedown) await OneSignal.Slidedown.promptPush();
+        await OneSignal.registerForPushNotifications();
+      } finally { refreshState(); }
+    };
+    document.getElementById('btnUnsub').onclick = async () => {
+      try {
+        await OneSignal.setSubscription(false);
+      } finally { refreshState(); }
+    };
+
+    OneSignal.on('subscriptionChange', refreshState);
+    refreshState();
+  });
+</script>
 </head>
 <body>
 <div class="wrap">
