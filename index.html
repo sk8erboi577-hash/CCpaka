@@ -402,23 +402,18 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
   from { transform: scale(0.8); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
-/* === AESTHETIC ADD-ON === */
-/* 背景層次（柔焦漸層 + 光暈），不會影響你原來的色票與邊線 */
+/* THEME: Neutral Mist */
 body{
-  background:
-    radial-gradient(circle at 30% 30%, #eafbea 0%, #ffffff 70%);
-  background-attachment: fixed;
-  overflow-x: hidden;
+  background: radial-gradient(circle at 30% 30%, #f4f6f8 0%, #ffffff 70%);
+  background-attachment: fixed; overflow-x:hidden;
 }
 body::before{
-  content:"";
-  position:fixed; inset:0; z-index:0; pointer-events:none;
+  content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
   background:
-    radial-gradient(600px at 20% 20%, rgba(255,255,255,.45), transparent 70%),
-    radial-gradient(800px at 85% 80%, rgba(22,163,74,.12), transparent 70%);
+    radial-gradient(600px at 20% 20%, rgba(255,255,255,.55), transparent 70%),
+    radial-gradient(800px at 85% 80%, rgba(100,116,139,.10), transparent 70%); /* slate-500 */
   filter: blur(60px);
 }
-
 /* 卡片細緻化（在你原本 .card 基礎上微補陰影與內緣光暈） */
 .card{
   position: relative;
