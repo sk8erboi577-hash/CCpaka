@@ -1561,22 +1561,19 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   // 點一下也可關閉，先取消，因為載入頁面會跳密碼自動輸入會檔畫面
   //overlay.addEventListener('click', ()=> overlay.remove());
 });
-function progressStart(){
-  const p = document.getElementById('freezeProg');
-  if(!p) return;
-  p.classList.remove('fin');
-  // 重新觸發 transition（避免連續操作不動）
-  void p.offsetWidth;
-  p.classList.add('on');
+ function progressStart(){
+  const p = document.getElementById('uiProgress'); if(!p) return;
+  p.classList.remove('fin'); p.style.opacity='1'; p.classList.add('on');
 }
-
-function progressDone(ok=true){
-  const p = document.getElementById('freezeProg');
-  if(!p) return;
-  p.classList.add('fin');
-  // 你原本在 success/failure 會呼叫 setFreeze(false)，保留即可
+function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌'){
+  const p = document.getElementById('uiProgress'); if(p){
+    p.classList.add('fin'); setTimeout(()=>{p.classList.remove('on','fin'); p.style.opacity='0'}, 450);
+  }
+  const t = document.getElementById('uiToast'); if(t){
+    t.textContent = msg; t.classList.toggle('err', !ok);
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+  }
 }
-
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
