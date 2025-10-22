@@ -453,6 +453,21 @@ body::before{
 .event.trip  .dot{ background: #06b6d4;     box-shadow:0 0 0 3px rgba(6,182,212,.15); }
 .event.corr  .dot{ background: #f59e0b;     box-shadow:0 0 0 3px rgba(245,158,11,.15); }
 
+  /* 只強化「打卡按鈕區」底下的 .btn-xl，不影響其他按鈕 */
+.punch-actions .btn-xl{position:relative;overflow:hidden;border-radius:16px}
+.punch-actions .btn-xl::before{
+  content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;
+  background:linear-gradient(135deg,#16a34a,#22c55e,#3b82f6);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.6
+}
+.punch-actions .btn-xl{animation:pulse 2s ease-in-out infinite alternate}
+@keyframes pulse{from{transform:translateZ(0)}to{transform:translateZ(0) scale(1.01)}}
+.punch-actions .btn-xl:active{transform:scale(.98);box-shadow:none}
+
+/* 若你原本 .btn 有邊框，可取消，讓外圈漸層更乾淨 */
+.punch-actions .btn-xl{border:none}
+
 </style>
 
 
@@ -490,10 +505,11 @@ body::before{
     <div class="grid h-100">
       <div id="clock" class="clock">🕓 現在時間：--</div>
 
-      <div class="row row-lg">
-        <button id="btn-in"  class="btn btn-primary">上班打卡</button>
-        <button id="btn-out" class="btn btn-secondary">下班打卡</button>
-      </div>
+      <div class="row row-lg punch-actions">
+  <button id="btn-in"  class="btn btn-primary btn-xl">上班打卡</button>
+  <button id="btn-out" class="btn btn-secondary btn-xl">下班打卡</button>
+</div>
+
 
       <div id="resp" class="card muted">尚未打卡</div>
 
