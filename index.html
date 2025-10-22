@@ -1576,11 +1576,6 @@ function progressDone(ok=true){
   p.classList.add('fin');
   // 你原本在 success/failure 會呼叫 setFreeze(false)，保留即可
 }
-  const t = document.getElementById('uiToast'); if(t){
-    t.textContent = msg; t.classList.toggle('err', !ok);
-    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
-  }
-}
 
 </script>
   <div id="uiProgress" class="ui-progress"></div>
