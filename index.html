@@ -402,6 +402,56 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
   from { transform: scale(0.8); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
+/* === AESTHETIC ADD-ON === */
+/* 背景層次（柔焦漸層 + 光暈），不會影響你原來的色票與邊線 */
+body{
+  background:
+    radial-gradient(circle at 30% 30%, #eafbea 0%, #ffffff 70%);
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background:
+    radial-gradient(600px at 20% 20%, rgba(255,255,255,.45), transparent 70%),
+    radial-gradient(800px at 85% 80%, rgba(22,163,74,.12), transparent 70%);
+  filter: blur(60px);
+}
+
+/* 卡片細緻化（在你原本 .card 基礎上微補陰影與內緣光暈） */
+.card{
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0,0,0,.08);
+  background: var(--card); /* 保留你的白底卡片 */
+}
+.card.main{ box-shadow: 0 8px 22px rgba(22,163,74,.18); }
+.card::after{
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  border: 1px solid rgba(255,255,255,.55);
+}
+
+/* 時間軸樣式（今日明細用） */
+.timeline{ position:relative; z-index:1; margin:8px 0; padding-left:24px; }
+.timeline::before{
+  content:""; position:absolute; left:10px; top:0; bottom:0;
+  width:3px; border-radius:3px;
+  background: linear-gradient(#c8e6c9, rgba(22,163,74,.35));
+}
+.event{ position:relative; margin:16px 0; }
+.event .dot{
+  position:absolute; left:-2px; top:6px; width:12px; height:12px; border-radius:50%;
+  background: var(--primary); box-shadow:0 0 0 3px rgba(22,163,74,.15);
+}
+.event .content{
+  background:#fff; border:1px solid var(--border); border-radius:12px;
+  padding:8px 12px; display:inline-flex; gap:8px; align-items:center;
+}
+.event .time{ font-variant-numeric: tabular-nums; opacity:.8; }
+.event.out  .dot{ background: var(--secondary); box-shadow:0 0 0 3px rgba(59,130,246,.15); }
+.event.leave .dot{ background: #9333ea;     box-shadow:0 0 0 3px rgba(147,51,234,.15); }
+.event.trip  .dot{ background: #06b6d4;     box-shadow:0 0 0 3px rgba(6,182,212,.15); }
+.event.corr  .dot{ background: #f59e0b;     box-shadow:0 0 0 3px rgba(245,158,11,.15); }
 
 </style>
 
@@ -456,6 +506,11 @@ body:has(#fab-tools){ --fab-clearance: 80px; }
 
       <div class="card h-100">
         <div class="title"><strong>今日明細</strong><div class="muted">只顯示最近 <span id="limitLabel">3</span> 筆</div></div>
+        
+  <!-- 新增：時間軸掛點（渲染後會出現在這） -->
+  <div id="timeline" class="timeline"></div>
+
+  <!-- 保留你原本的清單容器作備用（必要時可切回表格） -->
         <div id="todayList" class="grid" style="gap:10px"></div>
         <div style="margin-top:10px;text-align:center;"><button id="btnMore" class="btn btn-ghost" style="padding:8px 12px;border-radius:10px;">顯示更多</button></div>
       </div>
@@ -730,6 +785,46 @@ function $(s,el){ return (el||document).querySelector(s); }
       box.appendChild(row);
     });
   }
+  // 將今日事件畫成時間軸
+function renderTimeline(events){
+  const host = document.getElementById('timeline');
+  if (!host) return;
+
+  const esc = s => String(s||'')
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'","&#39;");
+
+  const hmFromStr = (str) => {
+    const m = String(str||'').match(/(\d{2}):(\d{2})/);
+    return m ? m[0] : '';
+  };
+
+  const mapped = (events||[])
+    .map(it => {
+      const type = String(it.type||'').toLowerCase(); // in/out/leave/trip/corr
+      const time = hmFromStr(it.datetime||it.time||'') || '';
+      let label  = (type==='in')  ? '上班打卡' :
+                   (type==='out') ? '下班打卡' :
+                   (type==='leave') ? '請假' :
+                   (type==='trip')  ? '出差' : (type==='corr' ? '補卡' : '事件');
+      return { type, time, label, site: it.site_id||'', dist: (typeof it.distance_m==='number') ? (it.distance_m+'m') : '' };
+    })
+    .sort((a,b)=> String(a.time).localeCompare(String(b.time)));
+
+  host.innerHTML = mapped.length
+    ? mapped.map(ev => `
+      <div class="event ${ev.type}">
+        <div class="dot"></div>
+        <div class="content">
+          <strong>${esc(ev.label)}</strong>
+          <span class="time">${esc(ev.time)}</span>
+          ${ev.site ? `<span class="muted">· ${esc(ev.site)}</span>` : ''}
+          ${ev.dist ? `<span class="muted">· ${esc(ev.dist)}</span>` : ''}
+        </div>
+      </div>`).join('')
+    : `<div class="muted" style="opacity:.8">今天尚無紀錄</div>`;
+}
+
   function refreshSummaryAndList(){
     var uid=$('#uid') ? $('#uid').value.trim() : '', pass=$('#pass') ? $('#pass').value.trim() : '';
     if(!uid || !pass){ renderSummary({}); renderTodayList([]); var ll=$('#limitLabel'); if(ll) ll.textContent='3'; return; }
@@ -737,7 +832,8 @@ function $(s,el){ return (el||document).querySelector(s); }
       renderSummary((ret && ret.summary)||{});
       ALL_LIST=(ret && ret.list ? ret.list.slice() : []).sort(function(a,b){ return String(b.datetime||'').localeCompare(String(a.datetime||'')); });
       var ll=$('#limitLabel'); if(ll) ll.textContent = SHOW_ALL ? ALL_LIST.length : 3;
-      renderTodayList(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+  renderTimeline(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+
     }).getTodaySummaryAndListSecure(uid, pass);
   }
   var _lastRefreshAt = 0;
@@ -749,7 +845,8 @@ function $(s,el){ return (el||document).querySelector(s); }
   document.getElementById('btnMore')?.addEventListener('click', function(){
     SHOW_ALL = !SHOW_ALL;
     var ll=$('#limitLabel'); if(ll) ll.textContent = SHOW_ALL ? ALL_LIST.length : 3;
-    renderTodayList(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+   renderTimeline(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+
   });
 
   window.__lastGeoCache = window.__lastGeoCache || null;
@@ -989,7 +1086,8 @@ document.getElementById('btn-help')?.addEventListener('click', function(){
         renderSummary((ret && ret.summary) || {});
         ALL_LIST = (ret && ret.list ? ret.list.slice() : []).sort(function(a,b){ return String(b.datetime||'').localeCompare(String(a.datetime||'')); });
         const ll = document.getElementById('limitLabel'); if (ll) ll.textContent = SHOW_ALL ? ALL_LIST.length : 3;
-        renderTodayList(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+    renderTimeline(SHOW_ALL ? ALL_LIST : ALL_LIST.slice(0,3));
+
       })
       .withFailureHandler(function(err){ setFreeze(false); alert('查詢失敗（伺服器）：' + (err && err.message || err)); })
       .getTodaySummaryAndListSecure(uid, pass);
