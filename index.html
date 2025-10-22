@@ -414,17 +414,6 @@ body::before{
     radial-gradient(800px at 85% 80%, rgba(100,116,139,.10), transparent 70%); /* slate-500 */
   filter: blur(60px);
 }
-/* 卡片細緻化（在你原本 .card 基礎上微補陰影與內緣光暈） */
-.card{
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0,0,0,.08);
-  background: var(--card); /* 保留你的白底卡片 */
-}
-.card.main{ box-shadow: 0 8px 22px rgba(22,163,74,.18); }
-.card::after{
-  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
-  border: 1px solid rgba(255,255,255,.55);
-}
 
 /* 時間軸樣式（今日明細用） */
 .timeline{ position:relative; z-index:1; margin:8px 0; padding-left:24px; }
