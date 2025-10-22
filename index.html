@@ -475,17 +475,6 @@ body::before{ display:none !important; }
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
 
-  /* 泡泡框內的進度列 */
-.freeze-progress{
-  height:4px; width:0; margin-top:10px; border-radius:999px;
-  background:linear-gradient(90deg,#34d399,#3b82f6);
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-  transition:width .28s ease;
-  opacity:.95;
-}
-.freeze-progress.on  { width:60%; }   /* 執行中 */
-.freeze-progress.fin { width:100%; }  /* 結束時收滿一下 */
-
 </style>
 
 
@@ -1024,7 +1013,6 @@ document.getElementById('btn-out')?.addEventListener('click', () => {
 
   progressStart();                      // ← 顶部進度條開始
   setFreeze(true, '正在更新月曆…');        // （保留原凍結遮罩）
-    <div id="freezeProg" class="freeze-progress"></div>
 
   google.script.run
     .withSuccessHandler(function(ret){
