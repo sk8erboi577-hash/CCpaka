@@ -449,6 +449,31 @@ body::before{ display:none !important; }
   background: radial-gradient(circle at 30% 30%, #f4f6f8 0%, #ffffff 70%); /* 很淡的灰白，可留可刪 */
   filter: blur(60px);
 }
+/* 統一卡片標題：色條 + 主/副標 */
+.ui-title{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
+.ui-title .bar{width:6px;height:16px;border-radius:4px;background:#16a34a;opacity:.95}
+.ui-title .text{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.ui-title .text strong{font-weight:700}
+.ui-sub{font-size:.92em;opacity:.7}
+
+/* 依卡片類型給不同色條（可選） */
+.card.summary .ui-title .bar{background:#0ea5e9}   /* 今日摘要 */
+.card.logs    .ui-title .bar{background:#9333ea}   /* 今日明細 */
+
+  /* 頂部細進度條（shimmer 風） */
+.ui-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:50;opacity:0;
+  background:linear-gradient(90deg,#34d399,#3b82f6);
+  box-shadow:0 2px 8px rgba(0,0,0,.08);transition:width .28s ease, opacity .2s}
+.ui-progress.on{opacity:1;width:60%}
+.ui-progress.fin{width:100%}
+
+/* 成功/錯誤 Toast */
+.ui-toast{position:fixed;left:50%;top:12px;transform:translateX(-50%);
+  background:#10b981;color:#fff;padding:10px 14px;border-radius:12px;
+  box-shadow:0 10px 24px rgba(16,185,129,.25);
+  opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:60}
+.ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
+.ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
 
 </style>
 
@@ -498,15 +523,30 @@ body::before{ display:none !important; }
 
       <div id="resp" class="card muted">尚未打卡</div>
 
-      <div class="card h-100">
-        <div class="title"><strong>今日摘要</strong><span id="sumBadge" class="badge" style="display:none">今日有異常</span></div>
+  <div class="card h-100 summary">
+  <div class="ui-title">
+    <span class="bar"></span>
+    <div class="text">
+      <strong>今日摘要</strong>
+      <span class="ui-sub">今天的上/下班時間一覽</span>
+    </div>
+    <span id="sumBadge" class="badge" style="display:none">今日有異常</span>
+  </div>
+
         <div id="sumIn"  class="row" style="margin-bottom:8px"><span class="type-pill in">上班</span>&nbsp;<span class="muted">—</span></div>
         <div id="sumOut" class="row"><span class="type-pill out">下班</span>&nbsp;<span class="muted">—</span></div>
         <div id="sumAno" class="muted" style="margin-top:8px"></div>
       </div>
 
-      <div class="card h-100">
-        <div class="title"><strong>今日明細</strong><div class="muted">只顯示最近 <span id="limitLabel">3</span> 筆</div></div>
+  <div class="card h-100 logs">
+  <div class="ui-title">
+    <span class="bar"></span>
+    <div class="text">
+      <strong>今日明細</strong>
+      <span class="ui-sub">只顯示最近 <span id="limitLabel">3</span> 筆</span>
+    </div>
+  </div>
+
         
   <!-- 新增：時間軸掛點（渲染後會出現在這） -->
   <div id="timeline" class="timeline"></div>
@@ -966,20 +1006,28 @@ document.getElementById('btn-out')?.addEventListener('click', () => {
   document.getElementById('btn-open-calendar')?.addEventListener('click', ()=>window.open(CAL_WEBAPP_URL, '_blank', 'noopener'));
 
   document.getElementById('btn-refresh-cal')?.addEventListener('click', function(){
-    const uid  = document.querySelector('#uid')?.value.trim();
-    const pass = document.querySelector('#pass')?.value.trim();
-    if(!uid || !pass){ alert('請先輸入 UID 與 PASSCODE'); return; }
-    const now   = new Date(); const year  = now.getFullYear(); const month = now.getMonth() + 1;
-    setFreeze(true, '正在更新月曆…');
-    google.script.run
-      .withSuccessHandler(function(ret){
-        setFreeze(false);
-        if(!ret || ret.ok===false){ alert(ret && ret.message ? ret.message : '更新失敗'); return; }
-        alert(`已觸發更新 ${year} 年 ${month} 月的月曆！`);
-      })
-      .withFailureHandler(function(err){ setFreeze(false); alert('更新失敗：' + (err && err.message || err)); })
-      .rebuildCalendarSecure(uid, pass, year, month);
-  });
+  const uid  = document.getElementById('uid')?.value.trim();
+  const pass = document.getElementById('pass')?.value.trim();
+  if(!uid || !pass){ showToast('請先輸入 UID 與 PASSCODE','err'); return; }
+  const now   = new Date(); const year  = now.getFullYear(); const month = now.getMonth() + 1;
+
+  progressStart();                      // ← 顶部進度條開始
+  setFreeze(true, '正在更新月曆…');        // （保留原凍結遮罩）
+
+  google.script.run
+    .withSuccessHandler(function(ret){
+      setFreeze(false);
+      const ok = !!(ret && ret.ok !== false);
+      progressDone(ok, ok ? `月曆已觸發更新 ✅` : `更新失敗 ❌`);   // ← 顯示完成/失敗
+      if (ok) safeRefresh(true);                                   // ← 讓摘要/明細快刷一次
+    })
+    .withFailureHandler(function(err){
+      setFreeze(false);
+      progressDone(false, '更新失敗 ❌');                           // ← 顯示失敗
+    })
+    .rebuildCalendarSecure(uid, pass, year, month);
+});
+
 // 使用說明
 document.getElementById('btn-help')?.addEventListener('click', function(){
   var tpl  = document.getElementById('tpl-help');
@@ -1502,6 +1550,23 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   //overlay.addEventListener('click', ()=> overlay.remove());
 });
 
+  function progressStart(){
+  const p = document.getElementById('uiProgress'); if(!p) return;
+  p.classList.remove('fin'); p.style.opacity='1'; p.classList.add('on');
+}
+function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌'){
+  const p = document.getElementById('uiProgress'); if(p){
+    p.classList.add('fin'); setTimeout(()=>{p.classList.remove('on','fin'); p.style.opacity='0'}, 450);
+  }
+  const t = document.getElementById('uiToast'); if(t){
+    t.textContent = msg; t.classList.toggle('err', !ok);
+    t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
+  }
+}
+
 </script>
+  <div id="uiProgress" class="ui-progress"></div>
+<div id="uiToast" class="ui-toast">完成 ✅</div>
+
 </body>
 </html>
