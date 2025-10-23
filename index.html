@@ -1575,7 +1575,6 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
   }
 }
-  <script>
 (function(){
   const SHOW_SECONDS = false; // ← 要秒數改 true
   const root = document.getElementById('flipClock'); if(!root) return;
@@ -1628,7 +1627,6 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   }
   function pad2(n){ return n<10 ? '0'+n : ''+n; }
 })();
-</script>
 
 </script>
   <div id="uiProgress" class="ui-progress"></div>
