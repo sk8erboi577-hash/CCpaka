@@ -530,6 +530,19 @@ body::before{ display:none !important; }
       <strong>今日摘要</strong>
       <span class="ui-sub">今天的上/下班時間一覽</span>
     </div>
+      <!-- 翻牌時鐘（小號） -->
+  <div class="flip-clock small" id="flipClock" aria-label="現在時間">
+    <div class="fc-digit" data-value="0">0</div>
+    <div class="fc-digit" data-value="0">0</div>
+    <span class="fc-sep">:</span>
+    <div class="fc-digit" data-value="0">0</div>
+    <div class="fc-digit" data-value="0">0</div>
+    <!-- 如需顯示秒，JS 會自動打開下面三個 -->
+    <span class="fc-sep fc-sec-sep" style="display:none">:</span>
+    <div class="fc-digit fc-sec" data-value="0" style="display:none">0</div>
+    <div class="fc-digit fc-sec" data-value="0" style="display:none">0</div>
+  </div>
+</div>
     <span id="sumBadge" class="badge" style="display:none">今日有異常</span>
   </div>
 
@@ -1562,6 +1575,61 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
     t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2200);
   }
 }
+  <script>
+(function(){
+  const SHOW_SECONDS = false; // ← 要秒數改 true
+  const root = document.getElementById('flipClock'); if(!root) return;
+
+  const digitsAll = Array.from(root.querySelectorAll('.fc-digit'));
+  const h1=digitsAll[0], h2=digitsAll[1], m1=digitsAll[2], m2=digitsAll[3];
+  const secSep = root.querySelector('.fc-sec-sep');
+  const secDigits = Array.from(root.querySelectorAll('.fc-sec'));
+
+  if (SHOW_SECONDS) {
+    if (secSep) secSep.style.display = '';
+    secDigits.forEach(d=>d.style.display='');
+  }
+
+  // 初始化顯示
+  sync(true);
+  if (SHOW_SECONDS) {
+    setInterval(sync, 1000);
+  } else {
+    const t = new Date();
+    const msToNextMin = (60 - t.getSeconds())*1000 - t.getMilliseconds();
+    setTimeout(function tick(){ sync(); setInterval(sync, 60000); }, msToNextMin);
+  }
+
+  function sync(initial){
+    const d = new Date();
+    const hh = pad2(d.getHours());
+    const mm = pad2(d.getMinutes());
+    flipTo(h1, hh[0], initial);
+    flipTo(h2, hh[1], initial);
+    flipTo(m1, mm[0], initial);
+    flipTo(m2, mm[1], initial);
+    if (SHOW_SECONDS) {
+      const ss = pad2(d.getSeconds());
+      flipTo(secDigits[0], ss[0], initial);
+      flipTo(secDigits[1], ss[1], initial);
+    }
+  }
+
+  function flipTo(el, next, initial){
+    const cur = String(el.getAttribute('data-value') || '');
+    if (initial || cur === '' ){ el.setAttribute('data-value', next); el.textContent = next; return; }
+    if (cur === next) return;
+    const oldFlip = el.querySelector('.fc-flip'); if (oldFlip) oldFlip.remove();
+    const flip = document.createElement('div'); flip.className='fc-flip';
+    const front=document.createElement('div'); front.className='fc-front'; front.textContent=cur;
+    const back =document.createElement('div'); back.className ='fc-back';  back.textContent=next;
+    flip.append(front, back); el.appendChild(flip);
+    flip.addEventListener('animationend', ()=>{ el.setAttribute('data-value', next); el.textContent = next; flip.remove(); }, {once:true});
+  }
+  function pad2(n){ return n<10 ? '0'+n : ''+n; }
+})();
+</script>
+
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
