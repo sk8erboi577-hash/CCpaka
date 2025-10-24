@@ -1565,30 +1565,6 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
-
-  
-<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
-<script>
-  window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function (OneSignal) {
-    await OneSignal.init({
-      appId: "7509f3f6-6595-49fc-9bb1-869383ecf461",
-      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
-      serviceWorkerParam: { scope: "/CCpaka/" },
-    });
-
-    // 可選：綁身分＋標籤
-    try {
-      const uid = localStorage.getItem("uid");
-      if (uid) await OneSignal.login(uid);
-      await OneSignal.User.addTags({ role: "employee", app: "punch" });
-    } catch (e) {}
-
-    if (!(await OneSignal.Notifications.isPushEnabled())) {
-      await OneSignal.Slidedown.promptPush();
-    }
-  });
 </script>
-
 </body>
 </html>
