@@ -1566,38 +1566,42 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
 
-  <!-- OneSignal Web SDK -->
-<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" defer></script>
+<!-- OneSignal Web SDK v16 -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
-  // 等頁面與 SDK 載入
-  window.OneSignal = window.OneSignal || [];
-  OneSignal.push(function () {
-    OneSignal.init({
-      appId: "727093f5-4dad-4a84-a970-3961415c88a3",       // ← 換成你後台的 App ID
-      notifyButton: { enable: true },        // 右下角鈴鐺
-      allowLocalhostAsSecureOrigin: true     // 本地測試才會用到，保留無妨
-      // safari_web_id: "OPTIONAL_IF_NEEDED" // 之後如果要支援 Safari 再加
+  // v16 用 OneSignalDeferred 取代舊版 OneSignal.push
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "727093f5-4dad-4a84-a970-3961415c88a3",                 // ← 換成你後台的 App ID
+      // 很重要：因為你的站在 /CCpaka/ 子路徑，要指定 SW 路徑 & scope
+      serviceWorkerPath: 'OneSignalSDKWorker.js',
+      serviceWorkerUpdaterPath: 'OneSignalSDKUpdaterWorker.js',
+      serviceWorkerParam: { scope: '/CCpaka/' }
+      // 若將來要支援 Safari，再加 safariWebId: "WEB_ID"
     });
 
-    // 1) 如果你的頁面有 UID（例如登入後存在 localStorage），就綁定 External User ID
+    // v16 把 externalUserId 改名叫 "login"
     try {
-      const uid = localStorage.getItem('uid') || '';
-      if (uid) OneSignal.setExternalUserId(uid);
-    } catch(e){}
+      const uid = localStorage.getItem('uid');
+      if (uid) { OneSignal.login(uid); }    // 例如：'A001' 或使用者的 UID
+    } catch(e) {}
 
-    // 2) 幫使用者打上標籤（可用來分群推播）
-    OneSignal.sendTags({
-      role: "employee",           // 全員
-      app:  "punch"               // 你的打卡系統
-    });
+    // v16 的 tag API 改成 User.addTags / addTag
+    try {
+      await OneSignal.User.addTags({
+        role: 'employee',
+        app:  'punch'
+      });
+    } catch(e) {}
 
-    // 3) 第一次進站就彈出授權（如果還沒允許/拒絕）
-    OneSignal.isPushNotificationsEnabled().then((enabled) => {
-      if (!enabled) {
-        OneSignal.showSlidedownPrompt(); // 顯示 OneSignal 的授權面板
-      }
-    });
+    // 第一次進站主動詢問授權（也可改成點工具齒輪時再叫）
+    const enabled = await OneSignal.Notifications.isPushEnabled();
+    if (!enabled) {
+      await OneSignal.Slidedown.promptPush();   // v16 的授權面板
+    }
   });
+
 </script>
 
 </body>
