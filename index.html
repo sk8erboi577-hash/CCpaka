@@ -1572,30 +1572,25 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OneSignal) {
     await OneSignal.init({
-      appId: "727093f5-4dad-4a84-a970-3961415c88a3",                       // ← 換成後台顯示的 App ID
-      // 你的站是在 /CCpaka/ 子路徑，務必設定 SW 路徑 & scope
-      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
+      appId: "727093f5-4dad-4a84-a970-3961415c88a3",
+      // 告訴 OneSignal：使用我們自己的 sw.js，scope 就是 /CCpaka/
+      serviceWorkerPath: "/CCpaka/sw.js",
       serviceWorkerParam: { scope: "/CCpaka/" },
-         // 右下角鈴鐺（可關）
-      // safariWebId: "（將來要支援 Safari 再填）"
+      notifyButton: { enable: true }
     });
 
-    // （可選）登入綁定使用者身分
+    // （可選）登入 + 標籤
     try {
-      const uid = localStorage.getItem("uid");
-      if (uid) await OneSignal.login(uid);       // v16 用 login() 取代 setExternalUserId()
-    } catch (e) {}
+      const uid = localStorage.getItem('uid');
+      if (uid) await OneSignal.login(uid);
+      await OneSignal.User.addTags({ role:'employee', app:'punch' });
+    } catch(e){}
 
-    // 打上群組標籤，後台可用 Segment 篩選
-    try {
-      await OneSignal.User.addTags({ role: "employee", app: "punch" });
-    } catch (e) {}
-
-    // 第一次主動詢問授權（之後你也可以改成按「工具齒輪」時再叫）
-    const enabled = await OneSignal.Notifications.isPushEnabled();
-    if (!enabled) await OneSignal.Slidedown.promptPush(); // v16 的授權面板
+    // 第一次主動詢問
+    if (!(await OneSignal.Notifications.isPushEnabled())) {
+      await OneSignal.Slidedown.promptPush();
+    }
   });
 </script>
-
 </body>
 </html>
