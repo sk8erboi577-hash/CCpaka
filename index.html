@@ -1572,11 +1572,11 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OneSignal) {
     await OneSignal.init({
-      appId: "你的 APP ID",                       // ← 換成後台顯示的 App ID
+      appId: "727093f5-4dad-4a84-a970-3961415c88a3",                       // ← 換成後台顯示的 App ID
       // 你的站是在 /CCpaka/ 子路徑，務必設定 SW 路徑 & scope
       serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
       serviceWorkerParam: { scope: "/CCpaka/" },
-      notifyButton: { enable: true }             // 右下角鈴鐺（可關）
+         // 右下角鈴鐺（可關）
       // safariWebId: "（將來要支援 Safari 再填）"
     });
 
