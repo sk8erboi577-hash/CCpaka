@@ -1566,31 +1566,30 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
 
-<!-- OneSignal Web SDK v16 -->
+  
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function (OneSignal) {
     await OneSignal.init({
       appId: "727093f5-4dad-4a84-a970-3961415c88a3",
-      // 告訴 OneSignal：使用我們自己的 sw.js，scope 就是 /CCpaka/
-      serviceWorkerPath: "/CCpaka/sw.js",
+      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
       serviceWorkerParam: { scope: "/CCpaka/" },
       notifyButton: { enable: true }
     });
 
-    // （可選）登入 + 標籤
+    // 可選：綁身分＋標籤
     try {
-      const uid = localStorage.getItem('uid');
+      const uid = localStorage.getItem("uid");
       if (uid) await OneSignal.login(uid);
-      await OneSignal.User.addTags({ role:'employee', app:'punch' });
-    } catch(e){}
+      await OneSignal.User.addTags({ role: "employee", app: "punch" });
+    } catch (e) {}
 
-    // 第一次主動詢問
     if (!(await OneSignal.Notifications.isPushEnabled())) {
       await OneSignal.Slidedown.promptPush();
     }
   });
 </script>
+
 </body>
 </html>
