@@ -1569,39 +1569,32 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
 <!-- OneSignal Web SDK v16 -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
-  // v16 用 OneSignalDeferred 取代舊版 OneSignal.push
   window.OneSignalDeferred = window.OneSignalDeferred || [];
-  OneSignalDeferred.push(async function(OneSignal) {
+  OneSignalDeferred.push(async function (OneSignal) {
     await OneSignal.init({
-      appId: "727093f5-4dad-4a84-a970-3961415c88a3",                 // ← 換成你後台的 App ID
-      // 很重要：因為你的站在 /CCpaka/ 子路徑，要指定 SW 路徑 & scope
-      serviceWorkerPath: 'OneSignalSDKWorker.js',
-      serviceWorkerUpdaterPath: 'OneSignalSDKUpdaterWorker.js',
-      serviceWorkerParam: { scope: '/CCpaka/' }
-      // 若將來要支援 Safari，再加 safariWebId: "WEB_ID"
+      appId: "你的 APP ID",                       // ← 換成後台顯示的 App ID
+      // 你的站是在 /CCpaka/ 子路徑，務必設定 SW 路徑 & scope
+      serviceWorkerPath: "/CCpaka/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/CCpaka/" },
+      notifyButton: { enable: true }             // 右下角鈴鐺（可關）
+      // safariWebId: "（將來要支援 Safari 再填）"
     });
 
-    // v16 把 externalUserId 改名叫 "login"
+    // （可選）登入綁定使用者身分
     try {
-      const uid = localStorage.getItem('uid');
-      if (uid) { OneSignal.login(uid); }    // 例如：'A001' 或使用者的 UID
-    } catch(e) {}
+      const uid = localStorage.getItem("uid");
+      if (uid) await OneSignal.login(uid);       // v16 用 login() 取代 setExternalUserId()
+    } catch (e) {}
 
-    // v16 的 tag API 改成 User.addTags / addTag
+    // 打上群組標籤，後台可用 Segment 篩選
     try {
-      await OneSignal.User.addTags({
-        role: 'employee',
-        app:  'punch'
-      });
-    } catch(e) {}
+      await OneSignal.User.addTags({ role: "employee", app: "punch" });
+    } catch (e) {}
 
-    // 第一次進站主動詢問授權（也可改成點工具齒輪時再叫）
+    // 第一次主動詢問授權（之後你也可以改成按「工具齒輪」時再叫）
     const enabled = await OneSignal.Notifications.isPushEnabled();
-    if (!enabled) {
-      await OneSignal.Slidedown.promptPush();   // v16 的授權面板
-    }
+    if (!enabled) await OneSignal.Slidedown.promptPush(); // v16 的授權面板
   });
-
 </script>
 
 </body>
