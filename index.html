@@ -1565,6 +1565,84 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
+  <button id="btnEnablePush">啟用通知（一次性）</button>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
+
+  // 你的 Firebase 設定（照你貼的）
+  const firebaseConfig = {
+    apiKey: "AIzaSyBI09r-_a-sCnuCpiBfZLJQqGDK08TkieI",
+    authDomain: "paka-push.firebaseapp.com",
+    projectId: "paka-push",
+    storageBucket: "paka-push.firebasestorage.app",
+    messagingSenderId: "1039244883323",
+    appId: "1:1039244883323:web:b964319fdc14ce3e2cf9de",
+    measurementId: "G-K94VKTBVWB"
+  };
+
+  const app = initializeApp(firebaseConfig);
+
+  // GitHub Pages「專案頁面」的 SW 路徑：/你的repo/檔名
+  const SW_PATH = "/CCpaka/firebase-messaging-sw.js";
+  const VAPID_KEY = "BJfutCCRMiG-pkfAdMyQPDExgV1C0nFmof43piQJLLibSgSqKUXAkoMgY7LduesT_gK3EEVXuWvsND160qFW6kQ"; // ← 換成你的 VAPID 公鑰
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzk-4pcZvhTRS3pdV6uvjjwjdpChlb4u_LOcdJpG4SN4jg4U3g8GTEkFZC6iLji7lMa/exec"; // ← 之後要收 token 用
+
+  const btn = document.getElementById("btnEnablePush");
+  btn?.addEventListener("click", async () => {
+    try {
+      // 確認瀏覽器支援
+      if (!(await isSupported())) {
+        alert("此瀏覽器不支援 Web Push / FCM");
+        return;
+      }
+
+      // 1) 註冊 service worker
+      const reg = await navigator.serviceWorker.register(SW_PATH); // 重要：路徑要對
+      // 2) 要通知權限
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        alert("你拒絕了通知權限，可到瀏覽器設定開啟。");
+        return;
+      }
+
+      // 3) 取得 token（一定要帶 VAPID）
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, {
+        vapidKey: VAPID_KEY,
+        serviceWorkerRegistration: reg
+      });
+      if (!token) {
+        alert("取得 FCM token 失敗");
+        return;
+      }
+
+      // 4) 存起來 + 印出來（先確認能拿到）
+      localStorage.setItem("FCM_TOKEN", token);
+      console.log("FCM token:", token);
+      alert("啟用成功！token 已印在主控台");
+
+      // 5) （可先略過）把 token 丟到 GAS 存表，等一下我們會做對應的 doPost
+   const uid = localStorage.getItem("UID") || ""; // 沒 UID 就先別送，等登入有了再送
+    fetch(GAS_WEBAPP_URL, {
+   method: "POST",
+   mode: "no-cors",
+   body: JSON.stringify({ uid, token, ua: navigator.userAgent, ts: Date.now() })
+ }).catch(()=>{});
+    } catch (err) {
+      console.error(err);
+      alert("啟用通知時發生錯誤，請打開主控台查看詳情");
+    }
+  });
+
+  // 可選：頁面開著時收到前景訊息
+  onMessage(getMessaging(app), (payload) => {
+    console.log("FCM foreground message:", payload);
+    const t = payload?.notification?.title || "通知";
+    const b = payload?.notification?.body  || "";
+    alert(`${t}\n${b}`);
+  });
 </script>
 
 </body>
