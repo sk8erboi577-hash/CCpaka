@@ -475,6 +475,24 @@ body::before{ display:none !important; }
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
 
+
+  /* 右上角 ⏰ 圓形懸浮按鈕 */
+  #alarmPushFab{
+    position: fixed;
+    right: calc(env(safe-area-inset-right, 0px) + 12px);
+    top:  calc(env(safe-area-inset-top, 0px) + 12px);
+    z-index: 1100;
+    width: 48px; height: 48px;
+    border-radius: 9999px;
+    display: inline-flex; align-items: center; justify-content: center;
+    background:#111827; color:#fff; border:0;
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    -webkit-tap-highlight-color: transparent; cursor:pointer;
+  }
+  #alarmPushFab svg{ width:24px; height:24px; pointer-events:none }
+  /* 啟用成功後隱藏 */
+  #alarmPushFab.enabled{ display:none; }
+
 </style>
 
 
@@ -1640,6 +1658,74 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   // 可選：頁面開著時收到前景訊息
   onMessage(getMessaging(app), (payload) => {
     console.log("FCM foreground message:", payload);
+    const t = payload?.notification?.title || "通知";
+    const b = payload?.notification?.body  || "";
+    alert(`${t}\n${b}`);
+  });
+</script>
+<!-- ⏰ 啟用推播 FAB -->
+<button id="alarmPushFab" type="button" title="啟用上下班推播" aria-label="啟用上下班推播">
+  <!-- 小鬧鐘 SVG；想用圖片就改成 <img src="/CCpaka/img/alarm.png" width="24" height="24"> -->
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+    <path d="M7.88 3.39 5.7 1.2 1.2 5.7l2.18 2.19 4.5-4.5Zm8.24 0 4.5 4.5L22.8 5.7 18.3 1.2l-2.18 2.19ZM12 5a8 8 0 0 0-8 8c0 3.2 1.89 5.95 4.6 7.17L8 22h8l.4-1.83A8.01 8.01 0 0 0 20 13a8 8 0 0 0-8-8Zm1 4v3.59l2.7 2.7-1.4 1.41L11 14V9h2Z"/>
+  </svg>
+</button>
+<script type="module">
+  import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+  import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
+
+  // 你的 Firebase 設定（沿用你貼的那份）
+  const firebaseConfig = {
+    apiKey: "AIzaSyBI09r-_a-sCnuCpiBfZLJQqGDK08TkieI",
+    authDomain: "paka-push.firebaseapp.com",
+    projectId: "paka-push",
+    storageBucket: "paka-push.firebasestorage.app",
+    messagingSenderId: "1039244883323",
+    appId: "1:1039244883323:web:b964319fdc14ce3e2cf9de"
+  };
+
+  // ★ 改這兩個
+  const SW_PATH   = "/CCpaka/firebase-messaging-sw.js";     // 你的 GitHub Pages 專案路徑
+  const VAPID_KEY = "YOUR_VAPID_PUBLIC_KEY";                 // 你的 VAPID 公鑰
+
+  const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  const fab = document.getElementById("alarmPushFab");
+
+  // 若已授權且已存 token，就把按鈕藏起來
+  if (Notification.permission === "granted" && localStorage.getItem("FCM_TOKEN")) {
+    fab?.classList.add("enabled");
+  }
+
+  fab?.addEventListener("click", async () => {
+    try {
+      if (!(await isSupported())) { alert("此瀏覽器不支援 Web Push/FCM"); return; }
+
+      // 1) 註冊 service worker（路徑一定要對）
+      const reg = await navigator.serviceWorker.register(SW_PATH);
+
+      // 2) 要求通知權限
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") { alert("你拒絕了通知權限"); return; }
+
+      // 3) 取得 token（帶 VAPID + 指定 SW）
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg });
+      if (!token) { alert("取得 FCM token 失敗"); return; }
+
+      // 4) 存、印、藏按鈕
+      localStorage.setItem("FCM_TOKEN", token);
+      console.log("FCM token:", token);
+      fab.classList.add("enabled");
+
+      // （可留待下一步）送到 GAS：fetch("你的GAS WebApp URL", { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify({ uid: localStorage.getItem("UID")||"guest", token }) });
+    } catch (err) {
+      console.error(err);
+      alert("啟用推播時發生錯誤，請開主控台查看");
+    }
+  });
+
+  // 前景訊息簡易提示（可保留）
+  onMessage(getMessaging(app), (payload) => {
     const t = payload?.notification?.title || "通知";
     const b = payload?.notification?.body  || "";
     alert(`${t}\n${b}`);
