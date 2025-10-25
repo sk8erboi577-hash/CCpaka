@@ -474,20 +474,7 @@ body::before{ display:none !important; }
   opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:60}
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
-
-  /* 不要讓覆蓋層擋點擊 */
-.festival-overlay,
-#freeze-mask,
-#tool-mask {
-  pointer-events: none !important;
-}
-
-/* 頂部預留空間，避免右上兩顆固定按鈕壓到輸入列 */
-.wrap { padding-top: 72px !important; }
-
-/* 若還是會被按鈕壓住，讓輸入區佔更上層 */
-.card input { position: relative; z-index: 1200; }
-
+  
 </style>
 
 
