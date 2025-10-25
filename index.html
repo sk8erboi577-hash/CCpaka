@@ -474,7 +474,28 @@ body::before{ display:none !important; }
   opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:60}
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
-  
+
+  /* 只在 PWA (standalone) 模式套用 */
+@supports(padding: max(0px)) {
+  html.is-pwa .wrap {
+    /* 往下騰出空間：上方安全距 + 介面空隙 */
+    padding-top: calc(96px + env(safe-area-inset-top));
+  }
+  /* 右上固定鈕下移到安全區外 */
+  html.is-pwa .bell-btn { top: calc(12px + env(safe-area-inset-top)); }
+  html.is-pwa #btn-sound { top: calc(14px + env(safe-area-inset-top)); }
+}
+
+/* PWA 模式：避免任何覆蓋層擋點擊（仍可顯示，但不攔截） */
+html.is-pwa .festival-overlay,
+html.is-pwa #tool-mask,
+html.is-pwa #freeze-mask {
+  pointer-events: none !important;
+}
+
+/* 多保險：讓輸入欄在上層 */
+html.is-pwa .card input { position: relative; z-index: 1200; }
+
 </style>
 
 
@@ -1270,7 +1291,10 @@ document.getElementById('btn-help')?.addEventListener('click', function(){
   window.addEventListener('load', function(){ setTimeout(function(){ safeRefresh(false); }, 300 + Math.random()*3000); });
 
 })(); // 主 IIFE end
-
+(function markPWA(){
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+  if (isPWA) document.documentElement.classList.add('is-pwa');
+})();
 // ★新增：讓指定按鈕做一次 Pulse 動畫
 function pulseBtn(btnId){
   const el = document.getElementById(btnId);
@@ -1548,6 +1572,12 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 
   // 點一下也可關閉，先取消，因為載入頁面會跳密碼自動輸入會檔畫面
   //overlay.addEventListener('click', ()=> overlay.remove());
+  /* PWA 安全：最久 6 秒就把可能殘留的覆蓋層都移除 */
+setTimeout(() => {
+  document.querySelectorAll('.festival-overlay').forEach(el => el.remove());
+  const fm = document.getElementById('freeze-mask'); fm && (fm.style.display = 'none');
+  const tm = document.getElementById('tool-mask');   tm && (tm.classList.remove('show'));
+}, 6000);
 });
  function progressStart(){
   const p = document.getElementById('uiProgress'); if(!p) return;
@@ -1565,7 +1595,7 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
-
+  <button id="btnEnablePush">啟用通知（一次性）</button>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
   import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
@@ -1642,7 +1672,7 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
     const b = payload?.notification?.body  || "";
     alert(`${t}\n${b}`);
   });
-    <button id="btnEnablePush">啟用通知（一次性）</button>
+
 </script>
 </body>
 </html>
