@@ -475,6 +475,19 @@ body::before{ display:none !important; }
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
 
+  /* 不要讓覆蓋層擋點擊 */
+.festival-overlay,
+#freeze-mask,
+#tool-mask {
+  pointer-events: none !important;
+}
+
+/* 頂部預留空間，避免右上兩顆固定按鈕壓到輸入列 */
+.wrap { padding-top: 72px !important; }
+
+/* 若還是會被按鈕壓住，讓輸入區佔更上層 */
+.card input { position: relative; z-index: 1200; }
+
 </style>
 
 
@@ -1565,7 +1578,7 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
 </script>
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
-  </script>
+
   <button id="btnEnablePush">啟用通知（一次性）</button>
 
 <script type="module">
@@ -1645,6 +1658,5 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
     alert(`${t}\n${b}`);
   });
 </script>
-
 </body>
 </html>
