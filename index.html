@@ -1638,7 +1638,7 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
       alert("啟用成功！token 已印在主控台");
 
       // 5) （可先略過）把 token 丟到 GAS 存表，等一下我們會做對應的 doPost
-   const uid = localStorage.getItem("UID") || ""; // 沒 UID 就先別送，等登入有了再送
+ const uid = localStorage.getItem("UID") || "guest";
     fetch(GAS_WEBAPP_URL, {
    method: "POST",
    mode: "no-cors",
