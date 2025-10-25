@@ -1566,8 +1566,6 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   <div id="uiProgress" class="ui-progress"></div>
 <div id="uiToast" class="ui-toast">完成 ✅</div>
 
-  <button id="btnEnablePush">啟用通知（一次性）</button>
-
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
   import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-messaging.js";
@@ -1644,6 +1642,7 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
     const b = payload?.notification?.body  || "";
     alert(`${t}\n${b}`);
   });
+    <button id="btnEnablePush">啟用通知（一次性）</button>
 </script>
 </body>
 </html>
