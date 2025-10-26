@@ -475,6 +475,46 @@ body::before{ display:none !important; }
 .ui-toast.err{background:#ef4444;box-shadow:0 10px 24px rgba(239,68,68,.25)}
 .ui-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
 
+  /* 標題列：左標題、右按鈕群 */
+.app-header{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px; margin: 6px 0 10px;
+}
+.app-title{ display:flex; align-items:center; gap:10px; margin:0; }
+
+/* 右側按鈕群（水平排列） */
+.app-actions{ display:flex; align-items:center; gap:10px; }
+
+/* 內嵌版小圓按鈕（不要用舊的 .bell-btn 固定定位樣式） */
+.icon-btn{
+  width:42px; height:42px; border-radius:50%;
+  border:2px solid var(--border); background:#fff;
+  font-size:22px; display:flex; align-items:center; justify-content:center;
+  box-shadow:0 6px 18px rgba(0,0,0,.08);
+  cursor:pointer;
+  transition:transform .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+.icon-btn:hover{ transform:scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,.14); }
+.icon-btn:active{ transform:scale(.96); box-shadow:0 4px 12px rgba(0,0,0,.18); }
+
+/* 紅點改成依附在按鈕右上角 */
+.app-actions .bell-dot{
+  position:absolute; width:10px; height:10px; border-radius:999px;
+  background:#ef4444; border:2px solid #fff; display:none;
+  transform: translate(7px, -7px);
+}
+.app-actions #btn-bell{ position:relative; } /* 讓紅點能定位 */
+.app-actions .bell-dot.show{ display:block; }
+
+/* 小螢幕微調 */
+@media (max-width:480px){
+  .icon-btn{ width:38px; height:38px; font-size:20px; }
+}
+
+/* —— 若你先前加過固定版的樣式，這裡確保不會套在新按鈕上 —— */
+.bell-btn{ display:none !important; }     /* 舊的固定按鈕整個隱藏 */
+#btn-sound.bell-btn{ display:none !important; } /* 再保險一次 */
+
 </style>
 
 
@@ -496,12 +536,17 @@ body::before{ display:none !important; }
 </head>
 <body>
 <div class="wrap">
-  <h1>打卡系統 <span id="appVersion" class="version-badge"></span></h1>
-
-  <!-- 🔔 通知 -->
-  <button id="btn-bell" class="bell-btn" title="查看我的申請">🔔<span id="bell-dot" class="bell-dot" aria-hidden="true"></span></button>
-  <!-- 🔊 音效開關 -->
-  <button id="btn-sound" class="bell-btn" title="切換打卡音效">🔊</button>
+<div class="app-header">
+  <h1 class="app-title">
+    打卡系統 <span id="appVersion" class="version-badge"></span>
+  </h1>
+  <div class="app-actions">
+    <button id="btn-sound" class="icon-btn" title="切換打卡音效">🔊</button>
+    <button id="btn-bell" class="icon-btn" title="查看我的申請">
+      🔔<span id="bell-dot" class="bell-dot" aria-hidden="true"></span>
+    </button>
+  </div>
+</div>
 
   <div class="card grid">
     <div class="row">
