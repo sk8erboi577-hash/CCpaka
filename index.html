@@ -1606,8 +1606,11 @@ function syncTokenToGAS(uidOverride){
     body: JSON.stringify({ uid, token, ua: navigator.userAgent, ts: Date.now() })
   }).catch(()=>{});
 }
-
-
+// 讓非 module 腳本也叫得到
+window.syncTokenToGAS = syncTokenToGAS;
+if (typeof window.syncTokenToGAS === 'function') {
+  window.syncTokenToGAS(uid);
+}
   const btn = document.getElementById("btnEnablePush");
   btn?.addEventListener("click", async () => {
     try {
