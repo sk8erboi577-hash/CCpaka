@@ -496,14 +496,12 @@ body::before{ display:none !important; }
 </head>
 <body>
 <div class="wrap">
-<h1>打卡系統 <span id="appVersion" class="version-badge"></span></h1>
+  <h1>打卡系統 <span id="appVersion" class="version-badge"></span></h1>
 
-<!-- 🔔 通知 -->
-<button id="btn-bell" class="bell-btn" title="查看我的申請">🔔
-  <span id="bell-dot" class="bell-dot" aria-hidden="true"></span>
-</button>
-<!-- 🔊 音效開關 -->
-<button id="btn-sound" class="bell-btn" title="切換打卡音效">🔊</button>
+  <!-- 🔔 通知 -->
+  <button id="btn-bell" class="bell-btn" title="查看我的申請">🔔<span id="bell-dot" class="bell-dot" aria-hidden="true"></span></button>
+  <!-- 🔊 音效開關 -->
+  <button id="btn-sound" class="bell-btn" title="切換打卡音效">🔊</button>
 
   <div class="card grid">
     <div class="row">
@@ -1132,9 +1130,6 @@ document.getElementById('btn-help')?.addEventListener('click', function(){
     setFreeze(true, '正在查詢今日…');
     google.script.run
       .withSuccessHandler(function(ret){
-// 登入成功就記住 UID，然後補送 token 綁定
-localStorage.setItem('UID', uid);
-syncTokenToGAS(uid);
         setFreeze(false);
         if (!ret || ret.ok === false){ alert('查詢失敗：' + (ret && ret.message || '未知錯誤')); return; }
         renderSummary((ret && ret.summary) || {});
@@ -1592,25 +1587,8 @@ function progressDone(ok=true, msg= ok?'月曆已更新 ✅':'更新失敗 ❌')
   // GitHub Pages「專案頁面」的 SW 路徑：/你的repo/檔名
   const SW_PATH = "/CCpaka/firebase-messaging-sw.js";
   const VAPID_KEY = "BJfutCCRMiG-pkfAdMyQPDExgV1C0nFmof43piQJLLibSgSqKUXAkoMgY7LduesT_gK3EEVXuWvsND160qFW6kQ"; // ← 換成你的 VAPID 公鑰
-  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzUcro_hfhGTIp0LXCCb-WNAlyjdIEWy1jSg9l0ekLXJxu9NuGgBnHgEcnIEnywlb5Q/exec"; // ← 之後要收 token 用
-  
-  // --- 把 token 與 UID 綁到 GAS 的小工具 ---
-function syncTokenToGAS(uidOverride){
-  const uid   = uidOverride || localStorage.getItem('UID');
-  const token = localStorage.getItem('FCM_TOKEN');
-  if (!uid || !token) return;
-  fetch(GAS_WEBAPP_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type":"application/json" },
-    body: JSON.stringify({ uid, token, ua: navigator.userAgent, ts: Date.now() })
-  }).catch(()=>{});
-}
-// 讓非 module 腳本也叫得到
-window.syncTokenToGAS = syncTokenToGAS;
-if (typeof window.syncTokenToGAS === 'function') {
-  window.syncTokenToGAS(uid);
-}
+  const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzk-4pcZvhTRS3pdV6uvjjwjdpChlb4u_LOcdJpG4SN4jg4U3g8GTEkFZC6iLji7lMa/exec"; // ← 之後要收 token 用
+
   const btn = document.getElementById("btnEnablePush");
   btn?.addEventListener("click", async () => {
     try {
@@ -1639,18 +1617,19 @@ if (typeof window.syncTokenToGAS === 'function') {
         alert("取得 FCM token 失敗");
         return;
       }
-// 4) 存起來 + 印出來
-localStorage.setItem("FCM_TOKEN", token);
-console.log("FCM token:", token);
-alert("啟用成功！token 已印在主控台");
-      
-// 5) 有 UID 才綁定；沒有就等登入後再補送
-const uid = localStorage.getItem("UID");
-if (uid) {
-  syncTokenToGAS(uid);
-} else {
-  console.log("[FCM] 已取得 token，但尚未登入，暫不綁定 UID");
-}
+
+      // 4) 存起來 + 印出來（先確認能拿到）
+      localStorage.setItem("FCM_TOKEN", token);
+      console.log("FCM token:", token);
+      alert("啟用成功！token 已印在主控台");
+
+      // 5) （可先略過）把 token 丟到 GAS 存表，等一下我們會做對應的 doPost
+   const uid = localStorage.getItem("UID") || ""; // 沒 UID 就先別送，等登入有了再送
+    fetch(GAS_WEBAPP_URL, {
+   method: "POST",
+   mode: "no-cors",
+   body: JSON.stringify({ uid, token, ua: navigator.userAgent, ts: Date.now() })
+ }).catch(()=>{});
     } catch (err) {
       console.error(err);
       alert("啟用通知時發生錯誤，請打開主控台查看詳情");
@@ -1664,14 +1643,6 @@ if (uid) {
     const b = payload?.notification?.body  || "";
     alert(`${t}\n${b}`);
   });
-  window.addEventListener('load', () => {
-  setTimeout(() => {
-    const uid   = localStorage.getItem('UID');
-    const token = localStorage.getItem('FCM_TOKEN');
-    if (uid && token) syncTokenToGAS(uid);
-  }, 2000);
-});
-
 </script>
 
 </body>
