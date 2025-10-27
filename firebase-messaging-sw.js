@@ -15,17 +15,17 @@ firebase.initializeApp({
 const messaging = firebase.messaging();
 
 // 背景訊息顯示（頁面關閉/背景時）
-messaging.onBackgroundMessage((payload) => {
-  const title = payload?.notification?.title || '通知';
-  const body  = payload?.notification?.body || '';
-  const icon  = '/CCpaka/icon-192.png';           // 你的網站 icon
-  const url   = payload?.fcmOptions?.link || '/CCpaka/';
-  self.registration.showNotification(title, { body, icon, data: { url } });
+messaging.onBackgroundMessage(({ data }) => {
+  const title = data?.title || '通知';
+  const body  = data?.body  || '';
+  const url   = data?.url   || '/CCpaka/';
+  self.registration.showNotification(title, {
+    body, icon: '/CCpaka/icon-192.png', data: { url }
+  });
 });
-
 // 點通知開啟你的打卡頁
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  const url = event.notification?.data?.url || '/CCpaka/';
-  event.waitUntil(clients.openWindow(url));
+self.addEventListener('notificationclick', (e) => {
+  e.notification.close();
+  const url = e.notification?.data?.url || '/CCpaka/';
+  e.waitUntil(clients.openWindow(url));
 });
